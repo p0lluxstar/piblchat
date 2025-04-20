@@ -1,13 +1,20 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import router from '@/router';
+import { useAuthStore } from '@/store/auth';
 
 const username = ref('');
 const email = ref('');
 const password = ref('');
 const isLoading = ref(false);
+const isError = ref(false);
+const errorMessage = ref('');
+const authStore = useAuthStore();
 
 const handleSubmit = async (): Promise<void> => {
   isLoading.value = true;
+  isError.value = false;
+  errorMessage.value = '';
 
   const payload = {
     userName: username.value,
@@ -25,12 +32,17 @@ const handleSubmit = async (): Promise<void> => {
       body: JSON.stringify(payload),
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      isError.value = true;
+      errorMessage.value = data.message;
+      throw new Error(data.message);
     }
 
-    const data = await response.json();
     console.log('User registered successfully:', data);
+    authStore.singUp();
+    router.push('/');
   } catch (error) {
     console.error('Error during registration:', error);
   }
@@ -68,6 +80,7 @@ const handleSubmit = async (): Promise<void> => {
         </div>
       </div>
       <button type="submit">Register</button>
+      <div v-if="isError" class="registration-form__error">{{ errorMessage }}</div>
     </form>
   </div>
 </template>
@@ -99,5 +112,9 @@ const handleSubmit = async (): Promise<void> => {
     display: inline-block;
     width: 80px;
   }
+}
+
+.registration-form__error {
+  color: red;
 }
 </style>

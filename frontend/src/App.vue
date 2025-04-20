@@ -1,12 +1,19 @@
 <script setup lang="ts">
-import RegistrationForm from './components/RegistrationForm.vue';
+import MainNav from './components/MainNav.vue';
 </script>
 
 <template>
   <header></header>
   <main>
-    <RegistrationForm />
+    <MainNav />
+    <router-view />
   </main>
 </template>
 
-<style scoped></style>
+<style scoped>
+.nav {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+</style>
