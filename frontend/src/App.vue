@@ -1,19 +1,11 @@
 <script setup lang="ts">
-import MainNav from './components/MainNav.vue';
+import HeaderBlock from './components/HeaderBlock.vue';
+import MainBlock from './components/MainBlock.vue';
 </script>
 
 <template>
-  <header></header>
-  <main>
-    <MainNav />
-    <router-view />
-  </main>
+  <HeaderBlock />
+  <MainBlock />
 </template>
 
-<style scoped>
-.nav {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-</style>
+<style scoped></style>

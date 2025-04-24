@@ -1,16 +1,16 @@
-<script setup lang="ts">
-import { storeToRefs } from 'pinia';
-import { useAuthStore } from '@/store/auth';
-
-const authStore = useAuthStore();
-const { isAuthenticated } = storeToRefs(authStore);
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <nav class="nav">
-    <router-link to="/">Home</router-link>
-    <router-link v-if="!isAuthenticated" to="/signup">SignUp</router-link>
-    <router-link v-if="!isAuthenticated" to="/signin">SignIn</router-link>
-    <router-link v-if="isAuthenticated" to="/logout">Logout</router-link>
+  <nav class="main-nav">
+    <div class="main-nav__section">
+      <router-link to="/">Chat</router-link>
+    </div>
   </nav>
 </template>
+
+<style scoped lang="scss">
+.main-nav {
+  display: flex;
+  justify-content: space-between;
+}
+</style>

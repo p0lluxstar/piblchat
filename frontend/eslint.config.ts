@@ -28,6 +28,7 @@ export default defineConfigWithVueTs(
       'vue/require-prop-types': 'warn', // Требует типизации пропсов
       'vue/require-default-prop': 'warn', // Требует значения по умолчанию для опциональных пропсов
       'vue/order-in-components': 'error', // Правильный порядок свойств в компонентах (data, props, methods и т.д.)
+      'vue/multi-word-component-names': 'off',
     },
   },
 

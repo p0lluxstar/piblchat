@@ -25,7 +25,7 @@ const handleSubmit = async (): Promise<void> => {
   };
 
   try {
-    const response = await fetch('http://192.168.22.120:3000/users', {
+    const response = await fetch('http://192.168.22.120:3000/users/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -62,19 +62,9 @@ const handleSubmit = async (): Promise<void> => {
 
 <template>
   <div class="registration-form">
-    <h1 class="registration-form__title">Registration Form</h1>
+    <h1 class="registration-form__title">Login Form</h1>
     <form @submit.prevent="handleSubmit" class="registration-form__form">
       <div class="registration-form__input-group">
-        <div class="registration-form__input-group-item">
-          <label for="username" class="registration-form__label">Username</label>
-          <input
-            type="text"
-            id="username"
-            v-model="username"
-            class="registration-form__input"
-            required
-          />
-        </div>
         <div class="registration-form__input-group-item">
           <label for="email" class="registration-form__label">E-mail</label>
           <input type="text" id="email" v-model="email" class="registration-form__input" required />
@@ -90,7 +80,7 @@ const handleSubmit = async (): Promise<void> => {
           />
         </div>
       </div>
-      <button type="submit">Register</button>
+      <button type="submit">Login</button>
       <div v-if="isError" class="registration-form__error">{{ errorMessage }}</div>
     </form>
   </div>
