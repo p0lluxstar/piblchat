@@ -108,4 +108,20 @@ export class UserService {
       data: updatedData,
     });
   }
+
+  async findByUserNameForChat(userName: string): Promise<Pick<User, 'id' | 'userName'> | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { userName },
+      select: {
+        id: true,
+        userName: true,
+      },
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    return user;
+  }
 }

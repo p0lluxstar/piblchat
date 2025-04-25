@@ -1,5 +1,5 @@
 <script setup lang="ts"></script>
 
-<template><h1>Greeting</h1></template>
+<template><p>Аторизируйтесь, что бы воспользоваться чатом</p></template>
 
 <styles lang="scss"></styles>

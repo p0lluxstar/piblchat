@@ -4,6 +4,7 @@ import {
   Get,
   Post,
   Put,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -28,11 +29,17 @@ export class UserController {
 
   @Get()
   @UseGuards(AuthGuard)
-  async currententUser(
-    // @Req() req: IExpressRequest,
-    @UserDecorator() user: User
-  ): Promise<User> {
+  async currententUser(@UserDecorator() user: User): Promise<User> {
     return this.userService.buildUserResponse(user);
+  }
+
+  @Get('search')
+  @UseGuards(AuthGuard)
+  async findUserByUserName(
+    @Query('userName') userName: string
+  ): Promise<Pick<User, 'id' | 'userName'> | null> {
+    console.log('search', userName);
+    return this.userService.findByUserNameForChat(userName);
   }
 
   @Post()
@@ -55,7 +62,6 @@ export class UserController {
     @UserDecorator('id') currentUserId: number,
     @Body() updateUserDto: UpdateUserDto
   ): Promise<IUserResponse> {
-    console.log('updateUserDto', updateUserDto);
     const user = await this.userService.updateUser(currentUserId, updateUserDto);
     return this.userService.buildUserResponse(user);
   }

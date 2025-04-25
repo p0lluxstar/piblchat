@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import MainNav from '@/components/MainNav.vue';
 import { useAuthStore } from '@/store/useAuthStore';
 import IconLogout from './icons/IconLogout.vue';
+import UserNameBadge from './UserNameBadge.vue';
 
 const authStore = useAuthStore();
 const { isAuthenticated } = storeToRefs(authStore);
@@ -25,8 +26,7 @@ const handleLogout = (): void => {
       </div>
       <div class="user-panel__info" v-if="isAuthenticated">
         <div class="user-panel__info-text">
-          <span class="user-panel__name">User name: {{ authStore.user?.userName }}</span>
-          <span class="user-panel__email">Email: {{ authStore.user?.email }}</span>
+          <UserNameBadge :userName="authStore.user?.userName || ''" />
         </div>
         <button class="user-panel__logout-button" v-if="isAuthenticated" @click="handleLogout">
           <IconLogout />
@@ -43,7 +43,7 @@ const handleLogout = (): void => {
   align-items: center;
   height: 60px;
   padding: 10px 20px;
-  background-color: #dfdfdf;
+  background-color: #f7f7f7;
   border-bottom: 1px solid #dee2e6;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
@@ -63,6 +63,7 @@ const handleLogout = (): void => {
       .user-panel__info-text {
         display: flex;
         flex-direction: column;
+        justify-content: center;
         gap: 5px;
       }
     }

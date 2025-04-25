@@ -7,6 +7,10 @@ export interface JwtPayload {
 
 export function decodeToken(token: string): JwtPayload | null {
   try {
+    if (!token) {
+      console.error('No token provided');
+      return null;
+    }
     return jwtDecode<JwtPayload>(token);
   } catch (error) {
     console.error('Invalid token:', error);
