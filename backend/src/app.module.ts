@@ -1,12 +1,14 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ChatModule } from './chat/chat.module';
+import { MessageModule } from './message/message.modules';
 import { PrismaService } from './prisma/prisma.service';
 import { AuthMiddleware } from './user/middlewares/auth.middleware';
 import { UserModule } from './user/user.module';
 
 @Module({
-  imports: [UserModule],
+  imports: [UserModule, MessageModule, ChatModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
   exports: [PrismaService],

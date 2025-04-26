@@ -38,7 +38,6 @@ export class UserController {
   async findUserByUserName(
     @Query('userName') userName: string
   ): Promise<Pick<User, 'id' | 'userName'> | null> {
-    console.log('search', userName);
     return this.userService.findByUserNameForChat(userName);
   }
 

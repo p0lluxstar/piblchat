@@ -30,6 +30,7 @@ export class UserService {
   }
 
   async createUser(data: CreateUserDto): Promise<User> {
+    console.log('data', data);
     // Проверяем, существует ли пользователь с таким userName и email
     const existingUserByUserName = await this.prisma.user.findUnique({
       where: { userName: data.userName },
