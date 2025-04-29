@@ -1,9 +1,5 @@
 import { jwtDecode } from 'jwt-decode';
-
-export interface JwtPayload {
-  userName: string;
-  email: string;
-}
+import { type JwtPayload } from '../types/interfaces';
 
 export function decodeToken(token: string): JwtPayload | null {
   try {

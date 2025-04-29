@@ -59,6 +59,7 @@ export class UserService {
   generateToken(user: User): string {
     return sign(
       {
+        userId: user.id,
         userName: user.userName,
         email: user.email,
         roleId: user.roleId,

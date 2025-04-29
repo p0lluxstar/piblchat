@@ -2,6 +2,7 @@
 import Cookies from 'js-cookie';
 import { ref } from 'vue';
 import router from '@/router';
+import { connectSocket } from '@/socket';
 import { useAuthStore } from '@/store/useAuthStore';
 
 const username = ref('');
@@ -54,6 +55,7 @@ const handleSubmit = async (): Promise<void> => {
     console.log('User registered successfully:', data);
     authStore.singUp();
     router.push('/');
+    connectSocket();
   } catch (error) {
     console.error('Error during registration:', error);
   }

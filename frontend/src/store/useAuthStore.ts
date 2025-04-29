@@ -6,7 +6,7 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     isAuthenticated: false,
     token: null as string | null,
-    user: null as { userName: string; email: string } | null,
+    user: null as { userId: number; userName: string; email: string } | null,
   }),
   actions: {
     checkAuth() {
@@ -15,6 +15,7 @@ export const useAuthStore = defineStore('auth', {
 
       if (decoded) {
         this.user = {
+          userId: decoded.userId,
           userName: decoded.userName,
           email: decoded.email,
         };

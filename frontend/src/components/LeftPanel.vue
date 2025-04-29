@@ -1,134 +1,111 @@
 <script setup lang="ts">
-import Cookies from 'js-cookie';
+import '@/assets/styles/components/LeftPanel.scss';
 import { ref, watch } from 'vue';
-import type { ISearchUser } from '@/types/interfaces';
+import { socket } from '@/socket';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useSelectedChatStore } from '@/store/useSelectedChatStore';
+import type { IMessage, ISearchUser, IUserChat } from '@/types/interfaces';
+import { searchUsers } from '@/utils/userSearch';
 
-const searchQuery = ref('');
-const users = ref<ISearchUser[]>([]);
+const props = defineProps<{
+  userChats: IUserChat[];
+}>();
+
+const authStore = useAuthStore();
+const selectedChatStore = useSelectedChatStore();
+const searchUserNameQuery = ref('');
+const searchUser = ref<ISearchUser | null>(null);
+const selectedUser = ref<ISearchUser | null>(null);
+const emit = defineEmits(['userSelectedData', 'chatMessages']);
 let debounceTimeout: ReturnType<typeof setTimeout>;
-const emit = defineEmits(['user-data']);
+// const userChatsTemp = ref<IUserChat[]>([]);
 
-watch(searchQuery, (newQuery) => {
+watch(searchUserNameQuery, (newQuery) => {
   clearTimeout(debounceTimeout);
-
   debounceTimeout = setTimeout(async () => {
-    if (newQuery.trim().length === 0) {
-      users.value = [];
-      return;
-    }
-
-    const token = Cookies.get('auth_token');
-    if (!token) {
-      console.warn('Нет токена — пользователь не авторизован');
-      return;
-    }
-
-    try {
-      const res = await fetch(
-        `http://192.168.22.120:3000/users/search?userName=${encodeURIComponent(newQuery)}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error(`Ошибка HTTP: ${res.status}`);
-      }
-
-      const data = await res.json();
-      users.value = [data];
-    } catch (err) {
-      users.value = [];
-      console.error('Ошибка при поиске пользователей:', err);
-    }
+    searchUser.value = await searchUsers(newQuery);
   }, 500);
 });
 
-const handleUserSelect = (user: ISearchUser): void => {
-  emit('user-data', user);
-  searchQuery.value = '';
-  users.value = [];
+const handleUserSelectSearch = (user: ISearchUser): void => {
+  emit('userSelectedData', user);
+  selectedUser.value = user;
+  searchUserNameQuery.value = '';
+  searchUser.value = null;
+  emit('chatMessages', []);
 };
+
+const handleUserSelectChat = (user: ISearchUser & { chatId?: number }): void => {
+  emit('userSelectedData', user);
+  selectedUser.value = user;
+  searchUserNameQuery.value = '';
+  searchUser.value = null;
+
+  if (user.chatId) {
+    selectedChatStore.selectedChatId = user.chatId;
+  }
+
+  if (socket) {
+    socket.emit('get-messages', {
+      chatId: user.chatId,
+    });
+
+    socket.once('get-messages', (messages) => {
+      const chatMessages = messages.map((message: IMessage) => message.text);
+      emit('chatMessages', chatMessages);
+    });
+  }
+};
+
+const getUsersChat = (chatData: IUserChat[]): any => {
+  const myUserId = authStore.user?.userId;
+
+  return chatData.flatMap((chat) =>
+    chat.users
+      .filter((user) => user.id !== myUserId)
+      .map((user) => ({
+        ...user,
+        chatId: chat.id,
+      }))
+  );
+};
+
+// onMounted(async () => {
+//   userChatsTemp.value = await getUserChats(); // Присваиваем результат
+// });
 </script>
 
 <template>
   <div class="search-users">
     <input
       type="text"
-      v-model="searchQuery"
+      v-model="searchUserNameQuery"
       placeholder="Поиск пользователей..."
       class="search-input"
     />
-    <ul v-if="users.length">
-      <li v-for="user in users" :key="user.id">
-        <button @click="handleUserSelect(user)" class="user-button">
+    <div v-if="searchUser">
+      <button @click="handleUserSelectSearch(searchUser)" class="search-user-button">
+        {{ searchUser.userName }}
+      </button>
+    </div>
+    <div v-else-if="!searchUser && searchUserNameQuery" class="no-results">
+      Пользователь не найден
+    </div>
+  </div>
+  <div class="chats-section">
+    <h3>Ваши чаты</h3>
+    <ul v-if="props.userChats.length" class="chats-list">
+      <li v-for="user in getUsersChat(props.userChats)" :key="user.id">
+        <button
+          @click="handleUserSelectChat(user)"
+          :class="['user-selected-button', { active: selectedUser?.id === user.id }]"
+        >
           {{ user.userName }}
         </button>
       </li>
     </ul>
-    <div v-else-if="users.length === 0 && searchQuery" class="no-results">
-      Пользователь не найден
-    </div>
+    <div v-else class="no-chats">У вас пока нет чатов</div>
   </div>
-  <div>Ваши чаты</div>
 </template>
 
-<style scoped lang="scss">
-.search-users {
-  position: relative;
-
-  .search-input {
-    padding: 8px 12px;
-    width: 100%;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-
-  ul {
-    position: absolute;
-    display: flex;
-    justify-content: space-between;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #eee;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-top: 4px;
-    padding: 0;
-    list-style: none;
-    z-index: 10;
-
-    li {
-      width: 100%;
-    }
-
-    .no-results {
-      padding: 8px 12px;
-      color: #666;
-      font-style: italic;
-    }
-  }
-
-  .user-button {
-    width: 100%;
-    padding: 8px 12px;
-    text-align: left;
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s;
-
-    &:hover {
-      background-color: #f5f5f5;
-    }
-
-    &:active {
-      background-color: #ebebeb;
-    }
-  }
-}
-</style>
+<style scoped lang="scss"></style>

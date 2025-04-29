@@ -2,6 +2,7 @@
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import MainNav from '@/components/MainNav.vue';
+import { disconnectSocket } from '@/socket';
 import { useAuthStore } from '@/store/useAuthStore';
 import IconLogout from './icons/IconLogout.vue';
 import UserNameBadge from './UserNameBadge.vue';
@@ -13,6 +14,7 @@ const router = useRouter();
 const handleLogout = (): void => {
   authStore.logout(); // удалит токен из кук и сбросит auth
   router.push('/'); // редирект на главную
+  disconnectSocket(); // отключаем сокет при выходе
 };
 </script>
 

@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ChatGateway } from './chat/chat.gateway';
 import { ChatModule } from './chat/chat.module';
 import { MessageModule } from './message/message.modules';
 import { PrismaService } from './prisma/prisma.service';
@@ -10,7 +11,7 @@ import { UserModule } from './user/user.module';
 @Module({
   imports: [UserModule, MessageModule, ChatModule],
   controllers: [AppController],
-  providers: [AppService, PrismaService],
+  providers: [ChatGateway, AppService, PrismaService],
   exports: [PrismaService],
 })
 export class AppModule {
