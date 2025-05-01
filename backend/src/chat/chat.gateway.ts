@@ -23,20 +23,32 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // private readonly messageService: MessageService
   ) {}
 
+  private userSockets: Map<number, string> = new Map();
+
   @WebSocketServer() server: Server;
 
   // Подключение клиента
   async handleConnection(client: Socket) {
-    console.log(`Client connected socket: ${client.id}`);
+    const userId = Number(client.handshake.query.userId);
+
+    if (userId) {
+      this.userSockets.set(userId, client.id);
+      console.log(`User id: ${userId} connected with socket ${client.id}`);
+    }
   }
 
   // Отключение клиента
   async handleDisconnect(client: Socket) {
-    console.log(`Client disconnected socket: ${client.id}`);
+    const userId = [...this.userSockets.entries()].find(([_, id]) => id === client.id)?.[0];
+
+    if (userId) {
+      this.userSockets.delete(userId);
+      console.log(`User ${userId} disconnected`);
+    }
   }
 
-  @SubscribeMessage('start-chat')
-  async handleStartChat(client: Socket, payload: { userOneId: number; userTwoId: number }) {
+  @SubscribeMessage('create-chat')
+  async handleCreateChat(client: Socket, payload: { userOneId: number; userTwoId: number }) {
     try {
       // Проверяем, есть ли уже чат
       let chat = await this.chatService.findChatBetweenUsers(payload.userOneId, payload.userTwoId);
@@ -44,20 +56,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // Если нет — создаём
       if (!chat) {
         chat = await this.chatService.createChat(payload.userOneId, payload.userTwoId);
+
+        const userIds = [payload.userOneId, payload.userTwoId];
+
+        userIds.forEach((id) => {
+          const socketId = this.userSockets.get(id);
+          console.log('socketId', socketId);
+          if (socketId) {
+            this.server.to(socketId).emit('create-chat', {
+              chatId: chat.id,
+              userIds,
+            });
+          }
+        });
+
+        client.emit('create-chat-response', {
+          success: true,
+          chatId: chat.id,
+        });
       }
-
-      // // Ещё можно автоматически присоединить сокет в комнату чата
-      client.join(String(chat.id));
-
-      // Отправляем подтверждение
-      client.emit('join-confirmation', {
-        success: true,
-        chatId: chat.id,
-        message: 'Вы успешно подключены к чату',
-      });
     } catch (error) {
       console.error('Ошибка при создании чата:', error);
-      client.emit('join-confirmation', {
+      client.emit('create-chat-response', {
         success: false,
         error: 'Failed to join chat room',
       });
@@ -65,16 +85,37 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage('join-chat')
+  async handleStartChatTest(client: Socket, payload: { chatId: number }) {
+    try {
+      client.join(String(payload.chatId));
+    } catch (error) {
+      console.error('Ошибка при создании чата:', error);
+
+      throw new WsException('Failed to join chat room');
+    }
+  }
+
   @SubscribeMessage('send-message')
   async handleMessage(
     client: Socket,
-    payload: { userOneId: number; userTwoId: number; text: string; chatId: number }
+    payload: {
+      userOneId: number;
+      userTwoId: number;
+      senderId: number;
+      text: string;
+      chatId: number;
+    }
   ) {
-    console.log('payload handleMessage', payload);
     try {
-      this.messsgeService.createMessage(payload.chatId, payload.text);
+      this.messsgeService.createMessage(payload.chatId, payload.senderId, payload.text);
       const chat = `${payload.chatId}`;
+
+      console.log(payload, 'payload');
+
       this.server.to(chat).emit('new-message', {
+        chatId: payload.chatId,
+        senderId: payload.senderId,
         text: payload.text,
         createdAt: new Date(),
       });
@@ -84,41 +125,43 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  @SubscribeMessage('getUserChats')
-  async handleGetMyRooms(
-    client: Socket,
-    userId: number // Передаем userId из клиента
-  ) {
-    // console.log('Получение чатов пользователя с id:', userId);
-
-    // Получаем чаты пользователя из базы данных
+  @SubscribeMessage('get-user-chats')
+  async handleGetMyRooms(client: Socket, userId: number) {
     const chats = await this.chatService.findChatByUserId(userId);
 
-    console.log('Чаты пользователя:', chats);
-
-    // console.log('Чаты пользователя:', chats);
-
-    // Извлекаем только id чатов
-    const chatIds = chats.map((chat) => chat.id);
-
-    // console.log('Чаты пользователя:', chatIds);
-
-    // Можно также сразу подключить сокет к этим комнатам:
-    chatIds.forEach((chatId) => {
-      client.join(`chat_${chatId}`);
-    });
-
-    // Возвращаем клиенту список комнат
-    return { chats: chats };
+    return { chats };
   }
 
-  @SubscribeMessage('get-messages')
+  @SubscribeMessage('get-messages-chat')
   async handleGetMessages(client: Socket, payload: { chatId: number }) {
     try {
-      this.messsgeService.getMessagesByChatId(payload.chatId).then((messages) => {
-        console.log('Messages:', messages);
-        client.emit('get-messages', [...messages]);
-      });
+      const messegaes = await this.messsgeService.getMessagesByChatId(payload.chatId);
+      return messegaes;
     } catch (error) {}
+  }
+
+  @SubscribeMessage('delete-chat')
+  async handleDeleteChat(client: Socket, payload: { chatId: number }) {
+    try {
+      // Получаем участников чата
+      const participants = await this.chatService.getChatParticipants(payload.chatId);
+      const userIds = participants.map((user) => user.id);
+
+      // Удаляем чат и сообщения
+      await this.chatService.deleteChatAndMessages(payload.chatId);
+
+      // Оповещаем всех участников
+      userIds.forEach((userId) => {
+        const socketId = this.userSockets.get(userId);
+        if (socketId) {
+          this.server.to(socketId).emit('delete-chat', {
+            chatId: payload.chatId,
+          });
+        }
+      });
+    } catch (error) {
+      console.error('Ошибка при удалении чата:', error);
+      throw new WsException('Failed to delete chat');
+    }
   }
 }

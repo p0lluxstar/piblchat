@@ -5,5 +5,8 @@ export class CreateMessageDto {
   readonly chatId: number;
 
   @IsNotEmpty()
+  readonly senderId: number;
+
+  @IsNotEmpty()
   readonly text: string;
 }

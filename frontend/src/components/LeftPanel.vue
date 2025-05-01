@@ -2,9 +2,11 @@
 import '@/assets/styles/components/LeftPanel.scss';
 import { ref, watch } from 'vue';
 import { socket } from '@/socket';
+import { socketEmitJoinChat } from '@/socket/socketMethods';
+import { socketEmitGetMessagesChat } from '@/socket/socketMethods';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSelectedChatStore } from '@/store/useSelectedChatStore';
-import type { IMessage, ISearchUser, IUserChat } from '@/types/interfaces';
+import type { ISearchUser, IUserChat } from '@/types/interfaces';
 import { searchUsers } from '@/utils/userSearch';
 
 const props = defineProps<{
@@ -35,7 +37,7 @@ const handleUserSelectSearch = (user: ISearchUser): void => {
   emit('chatMessages', []);
 };
 
-const handleUserSelectChat = (user: ISearchUser & { chatId?: number }): void => {
+const handleUserSelectChat = (user: ISearchUser & { chatId: number }): void => {
   emit('userSelectedData', user);
   selectedUser.value = user;
   searchUserNameQuery.value = '';
@@ -43,15 +45,13 @@ const handleUserSelectChat = (user: ISearchUser & { chatId?: number }): void => 
 
   if (user.chatId) {
     selectedChatStore.selectedChatId = user.chatId;
+    console.log('user.chatId', selectedChatStore.selectedChatId);
   }
 
   if (socket) {
-    socket.emit('get-messages', {
-      chatId: user.chatId,
-    });
+    socketEmitJoinChat(user.chatId);
 
-    socket.once('get-messages', (messages) => {
-      const chatMessages = messages.map((message: IMessage) => message.text);
+    socketEmitGetMessagesChat(user.chatId).then((chatMessages) => {
       emit('chatMessages', chatMessages);
     });
   }
@@ -69,10 +69,6 @@ const getUsersChat = (chatData: IUserChat[]): any => {
       }))
   );
 };
-
-// onMounted(async () => {
-//   userChatsTemp.value = await getUserChats(); // Присваиваем результат
-// });
 </script>
 
 <template>

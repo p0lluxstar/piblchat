@@ -1,27 +1,32 @@
 <script setup lang="ts">
 import '@/assets/styles/components/RightPanel.scss';
-import Cookies from 'js-cookie';
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import UserNameBadge from '@/components/UserNameBadge.vue';
 import { socket } from '@/socket';
+import {
+  socketEmitCreateChat,
+  socketEmitDeleteChat,
+  socketEmitGetUserChats,
+  socketEmitSendMessage,
+  socketOnceStartChatResponse,
+} from '@/socket/socketMethods';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSelectedChatStore } from '@/store/useSelectedChatStore';
-import type { IMessage, ISearchUser } from '@/types/interfaces';
+import type { ISearchUser } from '@/types/interfaces';
+import { formatDay, formatTime, showDate } from '@/utils/formatDate';
 
 const props = defineProps<{
   userSelectedData: ISearchUser | null;
   chatMessages: any[];
 }>();
 
-const selectedUser = ref(props.userSelectedData);
-
 const authStore = useAuthStore();
 const selectedChatStore = useSelectedChatStore();
+const selectedUser = ref(props.userSelectedData);
 const selectedChatId = computed(() => selectedChatStore.selectedChatId);
 const messageText = ref('');
 const chatMessages = ref([...props.chatMessages]);
-
-// const userChats = ref<string[]>([]);
+const messagesContainer = ref<HTMLDivElement | null>(null);
 const emit = defineEmits(['userChats']);
 
 watch(
@@ -32,92 +37,108 @@ watch(
   },
   { deep: true }
 );
-const sendMessage = (): void => {
-  // if (!messageText.value.trim() || !props.userSelectedData) return;
 
-  if (!socket?.connected) {
-    console.warn('Соединение не установлено');
-    return;
+const sendMessage = async (): Promise<void> => {
+  // if (!messageText.value.trim() || !props.userSelectedData) return;
+  console.log(authStore.user?.userId);
+  if (!socket?.connected) return console.warn('Соединение не установлено');
+
+  if (!chatMessages.value.length) {
+    socketEmitCreateChat(authStore.user.userId, props.userSelectedData.id);
+
+    const startChatResponse = await socketOnceStartChatResponse(
+      authStore.user?.userId,
+      props.userSelectedData?.id,
+      messageText.value
+    );
+
+    if (startChatResponse) {
+      getUserChats();
+      selectedChatStore.selectedChatId = startChatResponse.chatId;
+    }
   }
 
-  socket.emit('start-chat', {
-    userOneId: authStore.user?.userId,
-    userTwoId: props.userSelectedData.id,
-  });
+  if (chatMessages.value.length) {
+    socketEmitSendMessage(
+      authStore.user?.userId,
+      props.userSelectedData?.id,
+      authStore.user?.userId,
+      messageText.value,
+      selectedChatId.value
+    );
+  }
 
-  // Отправлять сообщение ТОЛЬКО после подтверждения подключения
-  socket.once('join-confirmation', (data) => {
-    console.log('Подтверждение подключения к чату:', data);
+  messageText.value = '';
+  scrollToBottom();
+};
 
-    if (data.success) {
-      console.log(`Подключились к чату с id: ${data.chatId}`);
+const getUserChats = async (): Promise<void> => {
+  const response = await socketEmitGetUserChats(authStore.user.userId);
 
-      // Теперь можно отправлять сообщение
-      if (socket) {
-        socket.emit('send-message', {
-          userOneId: authStore.user?.userId,
-          userTwoId: props.userSelectedData.id,
-          text: messageText.value,
-          chatId: data.chatId,
-        });
-      }
+  if (response?.chats) {
+    emit('userChats', response.chats);
+  }
+};
 
-      messageText.value = '';
-      selectedChatStore.selectedChatId = data.chatId; // Сохраняем в Pinia
-      fetchUserRooms();
-    } else {
-      console.error('Ошибка подключения к чату:', data.error);
+const handleDeleteChat = (): void => {
+  if (!selectedChatId.value) return;
+
+  socketEmitDeleteChat(selectedChatId.value);
+};
+
+const handleKeyEnter = (event: KeyboardEvent): void => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    sendMessage();
+  }
+};
+
+const scrollToBottom = (): void => {
+  nextTick(() => {
+    if (messagesContainer.value) {
+      messagesContainer.value.scrollTo({
+        top: messagesContainer.value.scrollHeight,
+        behavior: 'smooth',
+      });
     }
   });
 };
+
+watch(chatMessages, scrollToBottom, { deep: true });
+
+onMounted(scrollToBottom);
 
 onMounted(() => {
   if (!socket) return;
 
-  // Подписка на новые сообщения
   socket.on('new-message', (data) => {
-    chatMessages.value.push(data.text);
+    if (selectedChatStore.selectedChatId === data.chatId) {
+      chatMessages.value.push(data);
+      return;
+    }
   });
 
-  fetchUserRooms();
+  socket.on('delete-chat', (data) => {
+    if (data) {
+      getUserChats();
+      selectedUser.value = null;
+      return;
+    }
+  });
+
+  socket.on('create-chat', () => {
+    getUserChats();
+  });
+
+  getUserChats();
 });
 
 onUnmounted(() => {
   if (!socket) return;
+  socket.off('create-chat');
   socket.off('new-message');
-  socket.off('join-confirmation');
+  socket.off('delete-chat');
 });
-
-const fetchUserRooms = (): void => {
-  if (!socket) return;
-
-  socket.emit('getUserChats', authStore.user?.userId, (response: { chats: any[] }) => {
-    if (!response?.chats) {
-      console.warn('Нет комнат в ответе');
-      return;
-    }
-
-    emit('userChats', response.chats);
-  });
-};
-
-const handleDeleteChat = async (): Promise<Promise<void>> => {
-  try {
-    const res = await fetch(
-      `http://192.168.22.120:3000/chat/delete?chatId=${selectedChatId.value}`,
-      {
-        method: 'DELETE',
-      }
-    );
-
-    if (!res.ok) throw new Error(`Ошибка HTTP: ${res.status}`);
-
-    fetchUserRooms();
-    selectedUser.value = null;
-  } catch (err) {
-    console.error('Ошибка при удалении чата:', err);
-  }
-};
 </script>
 
 <template>
@@ -128,16 +149,30 @@ const handleDeleteChat = async (): Promise<Promise<void>> => {
       <button @click="handleDeleteChat()">Удалить чат</button>
     </div>
     <div v-if="chatMessages.length === 0" class="empty-chat">Нет сообщений</div>
-    <div class="messages-list">
+    <div class="message-content" ref="messagesContainer">
       <div v-for="(message, index) in chatMessages" :key="index" class="message">
-        <div class="message-content">
-          {{ message }}
+        <div v-if="showDate(index, chatMessages)" class="date-separator">
+          {{ formatDay(message.createdAt) }}
+        </div>
+        <div>
+          <div v-if="message.senderId === authStore.user?.userId" class="sender">
+            {{ message.text }}
+            {{ formatTime(message.createdAt) }}
+          </div>
+          <div v-else class="receiver">
+            {{ message.text }}
+            {{ formatTime(message.createdAt) }}
+          </div>
         </div>
       </div>
     </div>
-
     <div class="message-input">
-      <textarea v-model="messageText" placeholder="Введите сообщение..." rows="1"></textarea>
+      <textarea
+        v-model="messageText"
+        placeholder="Введите сообщение..."
+        rows="1"
+        @keydown="handleKeyEnter"
+      ></textarea>
       <button @click="sendMessage">Отправить</button>
     </div>
   </div>

@@ -6,6 +6,7 @@ export interface ISearchUser {
 export interface IMessage {
   userId: number;
   text: string;
+  createdAt: string;
 }
 
 export interface JwtPayload {

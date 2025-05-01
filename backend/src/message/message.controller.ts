@@ -19,7 +19,7 @@ export class MessageController {
 
   @Post()
   async createMessage(@Body() body: CreateMessageDto) {
-    const message = await this.messageService.createMessage(body.chatId, body.text);
+    const message = await this.messageService.createMessage(body.chatId, body.senderId, body.text);
     return message;
   }
 

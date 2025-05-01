@@ -76,4 +76,17 @@ export class ChatService {
       where: { id: chatId },
     });
   }
+
+  async getChatParticipants(chatId: number) {
+    return this.prisma.chat
+      .findUnique({
+        where: { id: chatId },
+        select: {
+          users: {
+            select: { id: true },
+          },
+        },
+      })
+      .then((chat) => chat?.users || []);
+  }
 }
