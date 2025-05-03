@@ -1,5 +1,5 @@
 import { Controller, Delete, Get, Query, UseGuards } from '@nestjs/common';
-import { Chat } from '@prisma/client';
+import { Chat, User } from '@prisma/client';
 import { AuthGuard } from '../user/guards/auth.guard';
 import { ChatService } from './chat.service';
 

@@ -17,8 +17,26 @@ export class UserService {
     });
   }
 
-  async findByUserName(userName: string): Promise<User | null> {
+  async findUserByUserName(userName: string): Promise<User | null> {
     return await this.prisma.user.findUnique({ where: { userName } });
+  }
+
+  async findUsersByUserName(
+    userName: string
+  ): Promise<{ id: number; userName: string; colorAvatar: string }[]> {
+    return this.prisma.user.findMany({
+      where: {
+        userName: {
+          startsWith: userName,
+        },
+      },
+      select: {
+        id: true,
+        userName: true,
+        colorAvatar: true,
+      },
+      take: 5, // ограничиваем количество результатов до 5
+    });
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -30,8 +48,6 @@ export class UserService {
   }
 
   async createUser(data: CreateUserDto): Promise<User> {
-    console.log('data', data);
-    // Проверяем, существует ли пользователь с таким userName и email
     const existingUserByUserName = await this.prisma.user.findUnique({
       where: { userName: data.userName },
     });
@@ -63,6 +79,7 @@ export class UserService {
         userName: user.userName,
         email: user.email,
         roleId: user.roleId,
+        colorAvatar: user.colorAvatar,
       },
       process.env.JWT_SECRET
     );

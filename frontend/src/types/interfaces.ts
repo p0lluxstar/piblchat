@@ -1,18 +1,14 @@
-export interface ISearchUser {
-  id: number;
+export interface IUserData {
+  userId: number;
   userName: string;
+  email: string;
+  colorAvatar: string;
 }
 
 export interface IMessage {
   userId: number;
   text: string;
   createdAt: string;
-}
-
-export interface JwtPayload {
-  userId: number;
-  userName: string;
-  email: string;
 }
 
 export interface IUserChat {

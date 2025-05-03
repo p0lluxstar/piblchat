@@ -13,4 +13,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   readonly roleId: number;
+
+  @IsNotEmpty()
+  readonly colorAvatar: string;
 }

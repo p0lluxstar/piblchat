@@ -41,6 +41,14 @@ export class UserController {
     return this.userService.findByUserNameForChat(userName);
   }
 
+  @Get('search-users')
+  @UseGuards(AuthGuard)
+  async findUsersByUserName(
+    @Query('userName') userName: string
+  ): Promise<{ id: number; userName: string }[]> {
+    return this.userService.findUsersByUserName(userName);
+  }
+
   @Post()
   @UsePipes(new ValidationPipe())
   async createUser(@Body() body: CreateUserDto) {

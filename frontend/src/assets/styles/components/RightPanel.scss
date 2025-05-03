@@ -1,67 +1,59 @@
-.user-name {
-  display: flex;
-  background-color: #f0f0f0;
-  justify-content: left;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #ddd;
-}
+// .chat-container22222222 {
+//   display: flex;
+//   flex-direction: column;
+//   height: calc(100vh - 60px);
+//   background-color: #f0f0f0;
+//   padding: 20px;
+//   box-sizing: border-box;
+//   width: 60%;
+//   margin: 0 auto;
 
-.chat-container {
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 60px);
-  background-color: #f0f0f0;
-  padding: 20px;
-  box-sizing: border-box;
-  width: 60%;
-  margin: 0 auto;
+//   .message-content {
+//     height: 100%;
+//     overflow-y: overlay;
+//   }
 
-  .message-content {
-    height: 100%;
-    overflow-y: overlay;
-  }
+//   .sender {
+//     margin-left: 300px;
+//     color: green;
+//   }
 
-  .sender {
-    margin-left: 300px;
-    color: green;
-  }
+//   .receiver {
+//     color: red;
+//   }
+// }
 
-  .receiver {
-    color: red;
-  }
-}
+// .message-input {
+//   display: flex;
+//   gap: 8px;
+//   margin-top: auto;
+//   padding-top: 12px;
+//   border-top: 1px solid #ddd;
 
-.message-input {
-  display: flex;
-  gap: 8px;
-  margin-top: auto;
-  padding-top: 12px;
-  border-top: 1px solid #ddd;
+//   textarea {
+//     flex: 1;
+//     resize: none;
+//     padding: 8px;
+//     border: 1px solid #ccc;
+//     border-radius: 4px;
+//     font-family: inherit;
+//     font-size: 1rem;
+//   }
 
-  textarea {
-    flex: 1;
-    resize: none;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-family: inherit;
-    font-size: 1rem;
-  }
+//   button {
+//     padding: 8px 16px;
+//     background-color: #007bff;
+//     color: white;
+//     border: none;
+//     border-radius: 4px;
+//     cursor: pointer;
 
-  button {
-    padding: 8px 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+//     &:hover {
+//       background-color: #0069d9;
+//     }
+//   }
+// }
 
-    &:hover {
-      background-color: #0069d9;
-    }
-  }
-}
-
-.empty-chat {
-  padding: 20px;
-}
+// .empty-chat {
+//   padding: 20px;
+// }

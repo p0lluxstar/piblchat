@@ -1,13 +1,13 @@
 import { jwtDecode } from 'jwt-decode';
-import { type JwtPayload } from '../types/interfaces';
+import { type IUserData } from '../types/interfaces';
 
-export function decodeToken(token: string): JwtPayload | null {
+export function decodeToken(token: string): IUserData | null {
   try {
     if (!token) {
       console.error('No token provided');
       return null;
     }
-    return jwtDecode<JwtPayload>(token);
+    return jwtDecode<IUserData>(token);
   } catch (error) {
     console.error('Invalid token:', error);
     return null;

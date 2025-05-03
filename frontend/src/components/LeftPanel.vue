@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import '@/assets/styles/components/LeftPanel.scss';
 import { ref, watch } from 'vue';
 import { socket } from '@/socket';
 import { socketEmitJoinChat } from '@/socket/socketMethods';
 import { socketEmitGetMessagesChat } from '@/socket/socketMethods';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSelectedChatStore } from '@/store/useSelectedChatStore';
-import type { ISearchUser, IUserChat } from '@/types/interfaces';
-import { searchUsers } from '@/utils/userSearch';
+import type { IUserChat, IUserData } from '@/types/interfaces';
+import { searchUsersUtil } from '@/utils/searchUsersUtil';
+import UserBadge from './UserBadge.vue';
 
 const props = defineProps<{
   userChats: IUserChat[];
@@ -16,36 +16,37 @@ const props = defineProps<{
 const authStore = useAuthStore();
 const selectedChatStore = useSelectedChatStore();
 const searchUserNameQuery = ref('');
-const searchUser = ref<ISearchUser | null>(null);
-const selectedUser = ref<ISearchUser | null>(null);
+const searchUsers = ref<IUserData[]>([]);
+const selectedUser = ref<IUserData | null>(null);
+const isSearchActive = ref(false);
 const emit = defineEmits(['userSelectedData', 'chatMessages']);
 let debounceTimeout: ReturnType<typeof setTimeout>;
-// const userChatsTemp = ref<IUserChat[]>([]);
 
 watch(searchUserNameQuery, (newQuery) => {
+  isSearchActive.value = newQuery.length > 0;
   clearTimeout(debounceTimeout);
   debounceTimeout = setTimeout(async () => {
-    searchUser.value = await searchUsers(newQuery);
-  }, 500);
+    const users = await searchUsersUtil(newQuery);
+    searchUsers.value = users;
+  }, 300);
 });
 
-const handleUserSelectSearch = (user: ISearchUser): void => {
+const handleUserSelectSearch = (user: IUserData): void => {
   emit('userSelectedData', user);
   selectedUser.value = user;
   searchUserNameQuery.value = '';
-  searchUser.value = null;
+  searchUsers.value = [];
   emit('chatMessages', []);
 };
 
-const handleUserSelectChat = (user: ISearchUser & { chatId: number }): void => {
+const handleUserSelectChat = (user: IUserData & { chatId: number }): void => {
   emit('userSelectedData', user);
   selectedUser.value = user;
   searchUserNameQuery.value = '';
-  searchUser.value = null;
+  searchUsers.value = [];
 
   if (user.chatId) {
     selectedChatStore.selectedChatId = user.chatId;
-    console.log('user.chatId', selectedChatStore.selectedChatId);
   }
 
   if (socket) {
@@ -69,39 +70,74 @@ const getUsersChat = (chatData: IUserChat[]): any => {
       }))
   );
 };
+
+// const handleInputFocus = (): void => {
+//   isSearchActive.value = true;
+// };
+
+// const handleInputBlur = (): void => {
+//   // Не деактивируем сразу, чтобы можно было кликнуть по результатам поиска
+//   setTimeout(() => {
+//     if (searchUserNameQuery.value.length === 0) {
+//       isSearchActive.value = false;
+//     }
+//   }, 200);
+// };
 </script>
 
 <template>
-  <div class="search-users">
-    <input
-      type="text"
-      v-model="searchUserNameQuery"
-      placeholder="Поиск пользователей..."
-      class="search-input"
-    />
-    <div v-if="searchUser">
-      <button @click="handleUserSelectSearch(searchUser)" class="search-user-button">
-        {{ searchUser.userName }}
-      </button>
-    </div>
-    <div v-else-if="!searchUser && searchUserNameQuery" class="no-results">
-      Пользователь не найден
-    </div>
-  </div>
-  <div class="chats-section">
-    <h3>Ваши чаты</h3>
-    <ul v-if="props.userChats.length" class="chats-list">
-      <li v-for="user in getUsersChat(props.userChats)" :key="user.id">
-        <button
-          @click="handleUserSelectChat(user)"
-          :class="['user-selected-button', { active: selectedUser?.id === user.id }]"
+  <div class="left-panel-container">
+    <div class="left-panel__search">
+      <input
+        type="text"
+        v-model="searchUserNameQuery"
+        placeholder="Поиск..."
+        class="left-panel__search-input"
+      />
+      <div v-if="searchUsers" class="left-panel__search-results">
+        <!-- <button
+          @click="handleUserSelectSearch(searchUsers)"
+          class="left-panel__user-button left-panel__user-button--search"
         >
-          {{ user.userName }}
-        </button>
-      </li>
-    </ul>
-    <div v-else class="no-chats">У вас пока нет чатов</div>
+          {{ searchUsers.userName }}
+        </button> -->
+      </div>
+    </div>
+    <div v-if="isSearchActive" class="left-panel__search-results">
+      <ul v-if="searchUsers.length" class="left-panel__search-list">
+        <li v-for="user in searchUsers" :key="user.userId" class="left-panel__search-item">
+          <button @click="handleUserSelectSearch(user)" class="left-panel__user-button">
+            <UserBadge :userData="user" />
+          </button>
+        </li>
+      </ul>
+      <div v-else-if="searchUserNameQuery" class="left-panel__no-results">
+        Пользователь не найден
+      </div>
+    </div>
+    <div v-if="!searchUserNameQuery" class="left-panel__chats">
+      <ul v-if="props.userChats.length" class="left-panel__chats-list">
+        <li
+          v-for="user in getUsersChat(props.userChats)"
+          :key="user.id"
+          class="left-panel__chats-item"
+        >
+          <button
+            @click="handleUserSelectChat(user)"
+            :class="[
+              'left-panel__user-button',
+              { 'left-panel__user-button--active': selectedUser?.userId === user.id },
+            ]"
+          >
+            {{ user.userName }}
+          </button>
+        </li>
+      </ul>
+      <!-- <div v-else class="left-panel__no-chats">У вас пока нет чатов</div> -->
+    </div>
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+@use '@/assets/styles/components/LeftPanel.scss';
+</style>

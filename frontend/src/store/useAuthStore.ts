@@ -1,12 +1,13 @@
 import Cookies from 'js-cookie';
 import { defineStore } from 'pinia';
+import type { IUserData } from '@/types/interfaces';
 import { decodeToken } from '@/utils/decodeToken';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     isAuthenticated: false,
     token: null as string | null,
-    user: null as { userId: number; userName: string; email: string } | null,
+    user: null as IUserData | null,
   }),
   actions: {
     checkAuth() {
@@ -18,6 +19,7 @@ export const useAuthStore = defineStore('auth', {
           userId: decoded.userId,
           userName: decoded.userName,
           email: decoded.email,
+          colorAvatar: decoded.colorAvatar,
         };
         this.isAuthenticated = true;
       } else {

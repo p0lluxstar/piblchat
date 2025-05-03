@@ -1,0 +1,45 @@
+@use '@/assets/styles/mixins/forms' as *;
+
+.login-form-layout {
+  @include form-layout;
+}
+
+.login-container {
+  @include form-container;
+}
+
+.login-main-link {
+  @include form-main-link;
+}
+
+.login-form__title {
+  @include form-title;
+}
+
+.login-form__form {
+  @include form;
+}
+
+.login-form__input-group {
+  @include form-input-group;
+}
+
+.login-form__input-group-item {
+  @include form-input-group-item;
+}
+
+.login-form__label {
+  @include form-label;
+}
+
+.login-form__input {
+  @include form-input;
+}
+
+.login-form__button {
+  @include form-button;
+}
+
+.login-form__error {
+  @include form-error;
+}

@@ -1,0 +1,38 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  padding-left: 20px;
+  background-color: #c571f8;
+  border-bottom: 1px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+
+  .header__user-panel {
+    display: flex;
+  }
+
+  .header__logout-button {
+    border: none;
+    background: #c571f8;
+    border-left: 1px solid rgb(136, 71, 176);
+    height: 59px;
+    width: 40px;
+    margin-left: 10px;
+
+    svg {
+      width: 35px;
+      height: 35px;
+    }
+
+    &:hover {
+      cursor: pointer;
+      opacity: 0.8;
+    }
+  }
+
+  :deep(.user-panel__name) {
+    color: white;
+  }
+}

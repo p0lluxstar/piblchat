@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import '@/assets/styles/components/RightPanel.scss';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-import UserNameBadge from '@/components/UserNameBadge.vue';
+import UserBadge from '@/components/UserBadge.vue';
 import { socket } from '@/socket';
 import {
   socketEmitCreateChat,
@@ -12,11 +12,11 @@ import {
 } from '@/socket/socketMethods';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSelectedChatStore } from '@/store/useSelectedChatStore';
-import type { ISearchUser } from '@/types/interfaces';
+import type { IUserData } from '@/types/interfaces';
 import { formatDay, formatTime, showDate } from '@/utils/formatDate';
 
 const props = defineProps<{
-  userSelectedData: ISearchUser | null;
+  userSelectedData: IUserData | null;
   chatMessages: any[];
 }>();
 
@@ -48,7 +48,7 @@ const sendMessage = async (): Promise<void> => {
 
     const startChatResponse = await socketOnceStartChatResponse(
       authStore.user?.userId,
-      props.userSelectedData?.id,
+      props.userSelectedData?.userId,
       messageText.value
     );
 
@@ -61,7 +61,7 @@ const sendMessage = async (): Promise<void> => {
   if (chatMessages.value.length) {
     socketEmitSendMessage(
       authStore.user?.userId,
-      props.userSelectedData?.id,
+      props.userSelectedData?.userId,
       authStore.user?.userId,
       messageText.value,
       selectedChatId.value
@@ -142,38 +142,48 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div v-if="!selectedUser" class="empty-chat">Выберите чат</div>
-  <div v-else class="chat-container">
-    <UserNameBadge :userName="selectedUser.userName" />
-    <div v-if="chatMessages.length">
-      <button @click="handleDeleteChat()">Удалить чат</button>
-    </div>
-    <div v-if="chatMessages.length === 0" class="empty-chat">Нет сообщений</div>
-    <div class="message-content" ref="messagesContainer">
-      <div v-for="(message, index) in chatMessages" :key="index" class="message">
-        <div v-if="showDate(index, chatMessages)" class="date-separator">
-          {{ formatDay(message.createdAt) }}
-        </div>
-        <div>
-          <div v-if="message.senderId === authStore.user?.userId" class="sender">
-            {{ message.text }}
-            {{ formatTime(message.createdAt) }}
+  <div class="right-panel-container">
+    <div v-if="!selectedUser" class="right-panel__empty-chat">Выберите чат</div>
+    <div v-else class="right-panel__chat-container">
+      <UserBadge :userData="selectedUser" />
+      <div v-if="chatMessages.length" class="right-panel__delete-chat">
+        <button @click="handleDeleteChat()" class="right-panel__delete-button">Удалить чат</button>
+      </div>
+      <div v-if="chatMessages.length === 0" class="right-panel__empty-chat">Нет сообщений</div>
+      <div ref="messagesContainer" class="right-panel__messages">
+        <div v-for="(message, index) in chatMessages" :key="index" class="right-panel__message">
+          <div v-if="showDate(index, chatMessages)" class="right-panel__date-separator">
+            {{ formatDay(message.createdAt) }}
           </div>
-          <div v-else class="receiver">
-            {{ message.text }}
-            {{ formatTime(message.createdAt) }}
+          <div class="right-panel__message-content">
+            <div
+              v-if="message.senderId === authStore.user?.userId"
+              class="right-panel__message-text right-panel__message-text--sender"
+            >
+              {{ message.text }}
+              <span class="right-panel__message-time">
+                {{ formatTime(message.createdAt) }}
+              </span>
+            </div>
+            <div v-else class="right-panel__message-text right-panel__message-text--receiver">
+              {{ message.text }}
+              <span class="right-panel__message-time">
+                {{ formatTime(message.createdAt) }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="message-input">
-      <textarea
-        v-model="messageText"
-        placeholder="Введите сообщение..."
-        rows="1"
-        @keydown="handleKeyEnter"
-      ></textarea>
-      <button @click="sendMessage">Отправить</button>
+      <div class="right-panel__input">
+        <textarea
+          v-model="messageText"
+          placeholder="Введите сообщение..."
+          rows="1"
+          @keydown="handleKeyEnter"
+          class="right-panel__textarea"
+        ></textarea>
+        <button @click="sendMessage" class="right-panel__send-button">Отправить</button>
+      </div>
     </div>
   </div>
 </template>

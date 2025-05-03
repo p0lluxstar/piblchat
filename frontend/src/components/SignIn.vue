@@ -54,70 +54,43 @@ const handleSubmit = async (): Promise<void> => {
 
     console.log('User registered successfully:', data);
     authStore.singUp();
-    router.push('/');
+    router.push('/chat');
     connectSocket();
   } catch (error) {
-    console.error('Error during registration:', error);
+    console.error('Error during login:', error);
   }
 };
 </script>
 
 <template>
-  <div class="registration-form">
-    <h1 class="registration-form__title">Login Form</h1>
-    <form @submit.prevent="handleSubmit" class="registration-form__form">
-      <div class="registration-form__input-group">
-        <div class="registration-form__input-group-item">
-          <label for="email" class="registration-form__label">E-mail</label>
-          <input type="text" id="email" v-model="email" class="registration-form__input" required />
+  <div class="login-form-layout">
+    <div class="login-container">
+      <router-link to="/" class="login-main-link">❮</router-link>
+      <h1 class="login-form__title">Login Form</h1>
+      <form @submit.prevent="handleSubmit" class="login-form__form">
+        <div class="login-form__input-group">
+          <div class="login-form__input-group-item">
+            <label for="email" class="login-form__label">E-mail</label>
+            <input type="text" id="email" v-model="email" class="login-form__input" required />
+          </div>
+          <div class="login-form__input-group-item">
+            <label for="password" class="login-form__label">Password</label>
+            <input
+              type="password"
+              id="password"
+              v-model="password"
+              class="login-form__input"
+              required
+            />
+          </div>
         </div>
-        <div class="registration-form__input-group-item">
-          <label for="password" class="registration-form__label">Password</label>
-          <input
-            type="password"
-            id="password"
-            v-model="password"
-            class="registration-form__input"
-            required
-          />
-        </div>
-      </div>
-      <button type="submit">Login</button>
-      <div v-if="isError" class="registration-form__error">{{ errorMessage }}</div>
-    </form>
+        <button class="login-form__button" type="submit">Login</button>
+        <div v-if="isError" class="login-form__error">{{ errorMessage }}</div>
+      </form>
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.registration-form__title {
-  text-align: center;
-}
-
-.registration-form__form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 400px;
-  margin: auto;
-  gap: 1rem;
-}
-
-.registration-form__input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.registration-form__input-group-item {
-  label {
-    display: inline-block;
-    width: 80px;
-  }
-}
-
-.registration-form__error {
-  color: red;
-}
+@use '@/assets/styles/components/SignIn.scss';
 </style>

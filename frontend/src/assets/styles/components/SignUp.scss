@@ -1,0 +1,45 @@
+@use '@/assets/styles/mixins/forms' as *;
+
+.registration-form-layout {
+  @include form-layout;
+}
+
+.registration-container {
+  @include form-container;
+}
+
+.registration-main-link {
+  @include form-main-link;
+}
+
+.registration-form__title {
+  @include form-title;
+}
+
+.registration-form__form {
+  @include form;
+}
+
+.registration-form__input-group {
+  @include form-input-group;
+}
+
+.registration-form__input-group-item {
+  @include form-input-group-item;
+}
+
+.registration-form__label {
+  @include form-label;
+}
+
+.registration-form__input {
+  @include form-input;
+}
+
+.registration-form__button {
+  @include form-button;
+}
+
+.registration-form__error {
+  @include form-error;
+}
