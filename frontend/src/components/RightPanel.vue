@@ -10,6 +10,7 @@ import {
   socketEmitSendMessage,
   socketOnceStartChatResponse,
 } from '@/socket/socketMethods';
+import { useActiveChatsStore } from '@/store/useActiveChatsStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSelectedChatStore } from '@/store/useSelectedChatStore';
 import type { IUserData } from '@/types/interfaces';
@@ -34,6 +35,7 @@ const chatMessages = ref([...props.chatMessages]);
 const messagesContainer = ref<HTMLDivElement | null>(null);
 const { addEmojiToMessage } = useEmojiInsertione(messageText);
 const showDeleteConfirm = ref(false);
+const activeChatsStore = useActiveChatsStore();
 
 watch(
   [(): any => props.chatMessages, (): any => props.userSelectedData],
@@ -104,6 +106,8 @@ const confirmDelete = (): void => {
   if (!selectedChatId.value) return;
   socketEmitDeleteChat(selectedChatId.value);
   showDeleteConfirm.value = false;
+  activeChatsStore.removeChatById(selectedChatId.value);
+  selectedChatStore.clearSelectedChat();
 };
 
 watch(chatMessages, scrollToBottom, { deep: true });
@@ -129,10 +133,10 @@ onMounted(() => {
   });
 
   socket.on('create-chat', () => {
-    emit('loadUserChats');
+    // emit('loadUserChats');
   });
 
-  emit('loadUserChats');
+  // emit('loadUserChats');
 });
 
 onUnmounted(() => {
@@ -148,7 +152,7 @@ onUnmounted(() => {
     <div v-if="!selectedUser" class="right-panel__empty-chat">
       <p class="empty-state__description">
         Начните новый диалог или выберите <br />
-        существующий из списка ваших чатов.
+        существующий из вашего списка
       </p>
     </div>
     <div v-else class="right-panel__chat-container">

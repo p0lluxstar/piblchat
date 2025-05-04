@@ -3,7 +3,8 @@ import Cookies from 'js-cookie';
 import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
 import TheHeader from '@/components/TheHeader.vue';
-import TheMain from '@/components/TheMain.vue';
+import HomeLayout from '@/layouts/HomeLayout.vue';
+// import TheMain from '@/components/TheMain.vue';
 import { connectSocket } from './socket';
 import { useAuthStore } from './store/useAuthStore';
 
@@ -19,8 +20,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <TheHeader v-if="isAuthenticated" />
-  <TheMain />
+  <router-view />
 </template>
 
 <style scoped></style>

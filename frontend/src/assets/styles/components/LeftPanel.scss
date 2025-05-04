@@ -22,18 +22,25 @@
   }
 
   .left-panel__user-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
     height: 60px;
     background-color: #fafafa;
     border: none;
     border-bottom: solid 1px #e0e0e0;
-    display: flex;
-    align-items: center;
     cursor: pointer;
     padding-left: 10px;
+    padding-right: 10px;
 
     &:hover {
       background-color: white;
+    }
+
+    svg {
+      width: 25px;
+      height: 25px;
     }
   }
 

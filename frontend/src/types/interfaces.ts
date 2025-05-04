@@ -20,3 +20,10 @@ export interface IUserChat {
     colorAvatar: string;
   }[];
 }
+
+export interface IActiveChats {
+  id: number;
+  userName: string;
+  colorAvatar: string;
+  chatId: number;
+}

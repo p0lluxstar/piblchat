@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { socket } from '@/socket';
 import { socketEmitGetUserChats, socketEmitJoinChat } from '@/socket/socketMethods';
 import { socketEmitGetMessagesChat } from '@/socket/socketMethods';
+import { useActiveChatsStore } from '@/store/useActiveChatsStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSelectedChatStore } from '@/store/useSelectedChatStore';
 import type { IUserChat, IUserData } from '@/types/interfaces';
-import { searchUsersUtil } from '@/utils/searchUsersUtil';
+import { fetchSearchUsers } from '@/utils/fetchSearchUsers';
+import IconChatStatus from './icons/IconChatStatus.vue';
 import UserBadge from './UserBadge.vue';
 
+const emit = defineEmits(['userSelectedData', 'chatMessages']);
 const authStore = useAuthStore();
 const selectedChatStore = useSelectedChatStore();
 const searchUserNameQuery = ref('');
@@ -16,49 +19,51 @@ const searchUsers = ref<IUserData[]>([]);
 const selectedUser = ref<IUserData | null>(null);
 const isSearchActive = ref(false);
 const userChats = ref<IUserChat[]>([]);
-const emit = defineEmits(['userSelectedData', 'chatMessages']);
+const activeChatsStore = useActiveChatsStore();
+const savedActiveChats = computed(() => activeChatsStore.activeChats);
 let debounceTimeout: ReturnType<typeof setTimeout>;
 
 watch(searchUserNameQuery, (newQuery) => {
   isSearchActive.value = newQuery.length > 0;
   clearTimeout(debounceTimeout);
   debounceTimeout = setTimeout(async () => {
-    const users = await searchUsersUtil(newQuery);
-    searchUsers.value = users;
+    const getFetchUsers = await fetchSearchUsers(newQuery);
+    const otherUsers = getFetchUsers.filter((user) => user.id !== authStore.user?.id);
+
+    const usersWithChatStatus = otherUsers.map((item) => ({
+      ...item,
+      chatStatus: savedActiveChats.value.some((el) => el.id === item.id),
+    }));
+
+    searchUsers.value = usersWithChatStatus;
   }, 300);
 });
 
-const handleUserSelectSearch = (user: IUserData): void => {
+const handleUserSelect = (user: IUserData & { chatId?: number }): void => {
+  const foundChat = savedActiveChats.value.find((item) => item.id === user.id);
+
+  if (foundChat?.chatId) {
+    selectedChatStore.selectedChatId = foundChat.chatId;
+
+    if (socket) {
+      socketEmitJoinChat(foundChat.chatId);
+
+      socketEmitGetMessagesChat(foundChat.chatId).then((chatMessages) => {
+        emit('chatMessages', chatMessages);
+      });
+    }
+  }
+
   emit('userSelectedData', user);
-  selectedUser.value = user;
-  searchUserNameQuery.value = '';
-  searchUsers.value = [];
   emit('chatMessages', []);
-};
-
-const handleUserSelectChat = (user: IUserData & { chatId: number }): void => {
-  emit('userSelectedData', user);
   selectedUser.value = user;
   searchUserNameQuery.value = '';
   searchUsers.value = [];
-
-  if (user.chatId) {
-    selectedChatStore.selectedChatId = user.chatId;
-  }
-
-  if (socket) {
-    socketEmitJoinChat(user.chatId);
-
-    socketEmitGetMessagesChat(user.chatId).then((chatMessages) => {
-      emit('chatMessages', chatMessages);
-    });
-  }
 };
 
-const getUsersChat = (chatData: IUserChat[]): any => {
+const getUsersChat = (userChat: IUserChat[]): any => {
   const myUserId = authStore.user?.id;
-
-  return chatData.flatMap((chat) =>
+  const activeChats = userChat.flatMap((chat) =>
     chat.users
       .filter((user) => user.id !== myUserId)
       .map((user) => ({
@@ -66,20 +71,11 @@ const getUsersChat = (chatData: IUserChat[]): any => {
         chatId: chat.id,
       }))
   );
+
+  activeChatsStore.setChats(activeChats);
+
+  return activeChats;
 };
-
-// const handleInputFocus = (): void => {
-//   isSearchActive.value = true;
-// };
-
-// const handleInputBlur = (): void => {
-//   // Не деактивируем сразу, чтобы можно было кликнуть по результатам поиска
-//   setTimeout(() => {
-//     if (searchUserNameQuery.value.length === 0) {
-//       isSearchActive.value = false;
-//     }
-//   }, 200);
-// };
 
 const loadUserChats = async (): Promise<void> => {
   try {
@@ -98,6 +94,11 @@ defineExpose({ loadUserChats });
 onMounted(() => {
   loadUserChats();
 });
+
+onUnmounted(() => {
+  // очищаем при размонтировании
+  activeChatsStore.clearChats();
+});
 </script>
 
 <template>
@@ -113,8 +114,11 @@ onMounted(() => {
     <div v-if="isSearchActive" class="left-panel__search-results">
       <ul v-if="searchUsers.length" class="left-panel__search-list">
         <li v-for="user in searchUsers" :key="user.id" class="left-panel__search-item">
-          <button @click="handleUserSelectSearch(user)" class="left-panel__user-button">
+          <button @click="handleUserSelect(user)" class="left-panel__user-button">
             <UserBadge :userData="user" />
+            <span v-if="user.chatStatus" class="left-panel__user-chat-staus"
+              ><IconChatStatus
+            /></span>
           </button>
         </li>
       </ul>
@@ -126,7 +130,7 @@ onMounted(() => {
       <ul v-if="userChats.length" class="left-panel__chats-list">
         <li v-for="user in getUsersChat(userChats)" :key="user.id" class="left-panel__chats-item">
           <button
-            @click="handleUserSelectChat(user)"
+            @click="handleUserSelect(user)"
             :class="[
               'left-panel__user-button',
               { 'left-panel__user-button--active': selectedUser?.id === user.id },

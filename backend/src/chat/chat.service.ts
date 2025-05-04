@@ -20,7 +20,6 @@ export class ChatService {
   }
 
   async findChatByUserId(userId: number): Promise<Chat[]> {
-    console.log('userId', userId);
     const chats = await this.prisma.chat.findMany({
       where: {
         users: {

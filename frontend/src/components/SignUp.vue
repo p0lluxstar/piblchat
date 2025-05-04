@@ -54,7 +54,6 @@ const handleSubmit = async (): Promise<void> => {
       });
     }
 
-    console.log('User registered successfully:', data);
     authStore.singUp();
     router.push('/chat');
     connectSocket();
@@ -87,6 +86,16 @@ const handleSubmit = async (): Promise<void> => {
               type="text"
               id="email"
               v-model="email"
+              class="registration-form__input"
+              required
+            />
+          </div>
+          <div class="registration-form__input-group-item">
+            <label for="password" class="registration-form__label">Password</label>
+            <input
+              type="password"
+              id="password"
+              v-model="password"
               class="registration-form__input"
               required
             />

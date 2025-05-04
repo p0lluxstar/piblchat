@@ -4,17 +4,21 @@ import { useRouter } from 'vue-router';
 import TheLogo from '@/components/TheLogo.vue';
 import UserBadge from '@/components/UserBadge.vue';
 import { disconnectSocket } from '@/socket';
+import { useActiveChatsStore } from '@/store/useActiveChatsStore';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useSelectedChatStore } from '@/store/useSelectedChatStore';
 import IconLogout from './icons/IconLogout.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
 const { isAuthenticated, user } = storeToRefs(authStore);
+const selectedChatStore = useSelectedChatStore();
 
 const handleLogout = (): void => {
+  selectedChatStore.clearSelectedChat();
   authStore.logout(); // удалит токен из кук и сбросит auth
-  router.push('/'); // редирект на главную
   disconnectSocket(); // отключаем сокет при выходе
+  router.push('/'); // редирект на главную
 };
 </script>
 

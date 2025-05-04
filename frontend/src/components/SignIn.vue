@@ -91,6 +91,6 @@ const handleSubmit = async (): Promise<void> => {
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
 @use '@/assets/styles/components/SignIn.scss';
 </style>

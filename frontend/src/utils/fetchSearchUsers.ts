@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 import type { IUserData } from '@/types/interfaces';
 
-export async function searchUsersUtil(query: string): Promise<IUserData[] | []> {
+export async function fetchSearchUsers(query: string): Promise<IUserData[] | []> {
   if (query.trim().length === 0) return [];
 
   const token = Cookies.get('auth_token');

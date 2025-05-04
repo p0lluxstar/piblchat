@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import ChatLayout from '@/layouts/ChatLayout.vue';
+import HomeLayout from '@/layouts/HomeLayout.vue';
 import { useAuthStore } from '@/store/useAuthStore';
 import ChatView from '@/views/ChatView.vue';
 import HomeView from '@/views/HomeView.vue';
@@ -17,23 +19,35 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: RouteNames.HOME,
-      component: HomeView,
-    },
-    {
-      path: '/signup',
-      name: RouteNames.SIGN_IN,
-      component: SignUpView,
-    },
-    {
-      path: '/signin',
-      name: RouteNames.SIGN_UP,
-      component: SignInView,
+      component: HomeLayout,
+      children: [
+        {
+          path: '',
+          name: RouteNames.HOME,
+          component: HomeView,
+        },
+        {
+          path: 'signup',
+          name: RouteNames.SIGN_UP,
+          component: SignUpView,
+        },
+        {
+          path: 'signin',
+          name: RouteNames.SIGN_IN,
+          component: SignInView,
+        },
+      ],
     },
     {
       path: '/chat',
-      name: RouteNames.CHAT,
-      component: ChatView,
+      component: ChatLayout,
+      children: [
+        {
+          path: '',
+          name: RouteNames.CHAT,
+          component: ChatView,
+        },
+      ],
     },
   ],
 });
@@ -41,14 +55,13 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
 
-  // Если пользователь авторизован и пытается попасть на главную, авторизации, логина
   const guestOnlyRoutes: RouteNames[] = [RouteNames.HOME, RouteNames.SIGN_IN, RouteNames.SIGN_UP];
 
   if (authStore.isAuthenticated && to.name && guestOnlyRoutes.includes(to.name as RouteNames)) {
-    return next({ name: RouteNames.CHAT }); // Редирект на чат
+    return next({ name: RouteNames.CHAT });
   }
 
-  if (!authStore.isAuthenticated && to.name === 'chat') {
+  if (!authStore.isAuthenticated && to.name === RouteNames.CHAT) {
     return next({ name: RouteNames.HOME });
   }
 

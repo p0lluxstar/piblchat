@@ -111,8 +111,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.messsgeService.createMessage(payload.chatId, payload.senderId, payload.text);
       const chat = `${payload.chatId}`;
 
-      console.log(payload, 'payload');
-
       this.server.to(chat).emit('new-message', {
         chatId: payload.chatId,
         senderId: payload.senderId,
