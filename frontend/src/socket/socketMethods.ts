@@ -50,7 +50,7 @@ export const socketOnceStartChatResponse = (
     socket.once('create-chat-response', (data) => {
       if (data.success) {
         socketEmitJoinChat(data.chatId);
-        socketEmitSendMessage(userOneId, userTwoId, authStore.user?.userId, text, data.chatId);
+        socketEmitSendMessage(userOneId, userTwoId, authStore.user?.id, text, data.chatId);
       }
       resolve(data);
     });

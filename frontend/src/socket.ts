@@ -5,7 +5,7 @@ export let socket: Socket | null = null;
 
 export const connectSocket = (): Socket => {
   const authStore = useAuthStore();
-  const userId = authStore.user?.userId || null;
+  const userId = authStore.user?.id || null;
 
   if (!socket) {
     socket = io('http://localhost:3000', {

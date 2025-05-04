@@ -6,7 +6,6 @@ import { socket } from '@/socket';
 import {
   socketEmitCreateChat,
   socketEmitDeleteChat,
-  socketEmitGetUserChats,
   socketEmitSendMessage,
   socketOnceStartChatResponse,
 } from '@/socket/socketMethods';
@@ -14,6 +13,8 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useSelectedChatStore } from '@/store/useSelectedChatStore';
 import type { IUserData } from '@/types/interfaces';
 import { formatDay, formatTime, showDate } from '@/utils/formatDate';
+import IconDeleteChat from './icons/IconDeleteChat.vue';
+import IconSendMessage from './icons/IconSendMessage.vue';
 
 const props = defineProps<{
   userSelectedData: IUserData | null;
@@ -27,7 +28,7 @@ const selectedChatId = computed(() => selectedChatStore.selectedChatId);
 const messageText = ref('');
 const chatMessages = ref([...props.chatMessages]);
 const messagesContainer = ref<HTMLDivElement | null>(null);
-const emit = defineEmits(['userChats']);
+const emit = defineEmits(['loadUserChats']);
 
 watch(
   [(): any => props.chatMessages, (): any => props.userSelectedData],
@@ -40,29 +41,29 @@ watch(
 
 const sendMessage = async (): Promise<void> => {
   // if (!messageText.value.trim() || !props.userSelectedData) return;
-  console.log(authStore.user?.userId);
+
   if (!socket?.connected) return console.warn('Соединение не установлено');
 
   if (!chatMessages.value.length) {
-    socketEmitCreateChat(authStore.user.userId, props.userSelectedData.id);
+    socketEmitCreateChat(authStore.user.id, props.userSelectedData.id);
 
     const startChatResponse = await socketOnceStartChatResponse(
-      authStore.user?.userId,
-      props.userSelectedData?.userId,
+      authStore.user?.id,
+      props.userSelectedData?.id,
       messageText.value
     );
 
     if (startChatResponse) {
-      getUserChats();
+      emit('loadUserChats');
       selectedChatStore.selectedChatId = startChatResponse.chatId;
     }
   }
 
   if (chatMessages.value.length) {
     socketEmitSendMessage(
-      authStore.user?.userId,
-      props.userSelectedData?.userId,
-      authStore.user?.userId,
+      authStore.user?.id,
+      props.userSelectedData?.id,
+      authStore.user?.id,
       messageText.value,
       selectedChatId.value
     );
@@ -70,14 +71,6 @@ const sendMessage = async (): Promise<void> => {
 
   messageText.value = '';
   scrollToBottom();
-};
-
-const getUserChats = async (): Promise<void> => {
-  const response = await socketEmitGetUserChats(authStore.user.userId);
-
-  if (response?.chats) {
-    emit('userChats', response.chats);
-  }
 };
 
 const handleDeleteChat = (): void => {
@@ -120,17 +113,17 @@ onMounted(() => {
 
   socket.on('delete-chat', (data) => {
     if (data) {
-      getUserChats();
+      emit('loadUserChats');
       selectedUser.value = null;
       return;
     }
   });
 
   socket.on('create-chat', () => {
-    getUserChats();
+    emit('loadUserChats');
   });
 
-  getUserChats();
+  emit('loadUserChats');
 });
 
 onUnmounted(() => {
@@ -143,30 +136,44 @@ onUnmounted(() => {
 
 <template>
   <div class="right-panel-container">
-    <div v-if="!selectedUser" class="right-panel__empty-chat">Выберите чат</div>
+    <div v-if="!selectedUser" class="right-panel__empty-chat">
+      <p class="empty-state__description">
+        Начните новый диалог или выберите <br />
+        существующий из списка ваших чатов.
+      </p>
+    </div>
     <div v-else class="right-panel__chat-container">
-      <UserBadge :userData="selectedUser" />
-      <div v-if="chatMessages.length" class="right-panel__delete-chat">
-        <button @click="handleDeleteChat()" class="right-panel__delete-button">Удалить чат</button>
+      <div class="right-panel__chart-header">
+        <UserBadge :userData="selectedUser" />
+        <div v-if="chatMessages.length" class="right-panel__delete-chat">
+          <button @click="handleDeleteChat()" class="right-panel__delete-button">
+            <IconDeleteChat />
+          </button>
+        </div>
       </div>
-      <div v-if="chatMessages.length === 0" class="right-panel__empty-chat">Нет сообщений</div>
+      <div v-if="chatMessages.length === 0" class="right-panel__empty-chat">
+        Отправьте первое сообщение
+      </div>
       <div ref="messagesContainer" class="right-panel__messages">
         <div v-for="(message, index) in chatMessages" :key="index" class="right-panel__message">
-          <div v-if="showDate(index, chatMessages)" class="right-panel__date-separator">
-            {{ formatDay(message.createdAt) }}
+          <div v-if="showDate(index, chatMessages)" class="right-panel__date-container">
+            <span class="right-panel__date">{{ formatDay(message.createdAt) }}</span>
           </div>
           <div class="right-panel__message-content">
             <div
-              v-if="message.senderId === authStore.user?.userId"
-              class="right-panel__message-text right-panel__message-text--sender"
+              v-if="message.senderId === authStore.user?.id"
+              class="right-panel__message-text-container right-panel__message-text--sender"
             >
-              {{ message.text }}
+              <span class="right-panel__message-text">{{ message.text }}</span>
               <span class="right-panel__message-time">
                 {{ formatTime(message.createdAt) }}
               </span>
             </div>
-            <div v-else class="right-panel__message-text right-panel__message-text--receiver">
-              {{ message.text }}
+            <div
+              v-else
+              class="right-panel__message-text-container right-panel__message-text--receiver"
+            >
+              <span class="right-panel__message-text">{{ message.text }}</span>
               <span class="right-panel__message-time">
                 {{ formatTime(message.createdAt) }}
               </span>
@@ -182,7 +189,7 @@ onUnmounted(() => {
           @keydown="handleKeyEnter"
           class="right-panel__textarea"
         ></textarea>
-        <button @click="sendMessage" class="right-panel__send-button">Отправить</button>
+        <button @click="sendMessage" class="right-panel__send-button"><IconSendMessage /></button>
       </div>
     </div>
   </div>

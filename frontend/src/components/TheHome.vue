@@ -8,8 +8,8 @@ const { isAuthenticated } = storeToRefs(authStore);
 </script>
 
 <template>
-  <div class="welcome-container">
-    <div class="welcome-page">
+  <div class="home-container">
+    <div class="home-page">
       <TheLogo />
       <h1>Добро пожаловать в наш чат!</h1>
       <p>Общайтесь с друзьями, коллегами и единомышленниками в удобном и безопасном мессенджере.</p>

@@ -1,59 +1,172 @@
-// .chat-container22222222 {
-//   display: flex;
-//   flex-direction: column;
-//   height: calc(100vh - 60px);
-//   background-color: #f0f0f0;
-//   padding: 20px;
-//   box-sizing: border-box;
-//   width: 60%;
-//   margin: 0 auto;
+@use '@/assets/styles/mixins/forms' as *;
 
-//   .message-content {
-//     height: 100%;
-//     overflow-y: overlay;
-//   }
+.right-panel-container {
+  display: flex;
+  height: calc(100vh - 60px);
+  background-image: url('../../img/jpg/background-chat.jpg');
 
-//   .sender {
-//     margin-left: 300px;
-//     color: green;
-//   }
+  .right-panel__empty-chat {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 
-//   .receiver {
-//     color: red;
-//   }
-// }
+    .empty-state__description {
+      color: #505050;
+      font-size: 2em;
+      font-weight: bold;
+    }
+  }
 
-// .message-input {
-//   display: flex;
-//   gap: 8px;
-//   margin-top: auto;
-//   padding-top: 12px;
-//   border-top: 1px solid #ddd;
+  .right-panel__chat-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
 
-//   textarea {
-//     flex: 1;
-//     resize: none;
-//     padding: 8px;
-//     border: 1px solid #ccc;
-//     border-radius: 4px;
-//     font-family: inherit;
-//     font-size: 1rem;
-//   }
+    .right-panel__delete-button {
+      background: none;
+      border: none;
 
-//   button {
-//     padding: 8px 16px;
-//     background-color: #007bff;
-//     color: white;
-//     border: none;
-//     border-radius: 4px;
-//     cursor: pointer;
+      &:hover {
+        cursor: pointer;
+        opacity: 0.8;
+      }
 
-//     &:hover {
-//       background-color: #0069d9;
-//     }
-//   }
-// }
+      svg {
+        width: 40px;
+        height: 40px;
+      }
+    }
 
-// .empty-chat {
-//   padding: 20px;
-// }
+    .right-panel__chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+      background-color: rgba(255, 255, 255, 0.5);
+      padding: 10px;
+      height: 60px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+
+      .user-panel__name {
+        color: #505050;
+      }
+    }
+
+    .right-panel__empty-chat {
+      margin-top: 10px;
+      color: #848484;
+    }
+
+    .right-panel__messages {
+      padding: 20px 20px 0px 20px;
+      height: 100%;
+      overflow-y: overlay;
+
+      .right-panel__message {
+        width: 60%;
+        margin: 0 auto;
+      }
+
+      .right-panel__date-container {
+        display: inline-block;
+        text-align: center;
+        width: 100%;
+        margin-bottom: 40px;
+
+        .right-panel__date {
+          display: inline-block;
+          width: 220px;
+          padding: 8px 0px;
+          border-radius: 20px;
+          background: #dfdfdf;
+          color: #505050;
+          font-weight: bold;
+        }
+      }
+
+      .right-panel__message-content {
+        .right-panel__message-text-container {
+          display: flex;
+          position: relative;
+          margin-bottom: 30px;
+
+          .right-panel__message-time {
+            position: absolute;
+            bottom: -14px;
+            font-size: 12px;
+            color: #505050;
+          }
+        }
+
+        .right-panel__message-text--sender {
+          justify-content: flex-end;
+
+          .right-panel__message-text {
+            padding: 10px 15px;
+            background-color: #c571f8;
+            border-radius: 20px 20px 5px 20px;
+            color: #fff;
+            max-width: 70%;
+          }
+        }
+
+        .right-panel__message-text--receiver {
+          justify-content: flex-start;
+
+          .right-panel__message-text {
+            padding: 10px 15px;
+            background-color: #dfdfdf;
+            border-radius: 20px 20px 20px 5px;
+            color: #505050;
+            max-width: 70%;
+          }
+        }
+      }
+    }
+
+    .right-panel__input {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      border-top: 1px solid #ddd;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.1);
+
+      .right-panel__textarea {
+        width: 70%;
+
+        @include form-input;
+        // flex: 1;
+        resize: none;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: 1rem;
+      }
+
+      .right-panel__send-button {
+        display: flex;
+        padding: 8px;
+        background-color: #c571f8;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        border-radius: 50%;
+
+        svg {
+          width: 25px;
+          height: 25px;
+        }
+
+        &:hover {
+          background-color: #cd7ffd;
+        }
+      }
+    }
+  }
+}

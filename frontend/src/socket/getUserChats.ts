@@ -7,7 +7,7 @@ export const getUserChats = async (): Promise<IUserChat[]> => {
 
   const chats = await new Promise<IUserChat[]>((resolve, reject) => {
     if (!socket) throw new Error('Socket не подключен');
-    socket.emit('getUserChats', authStore.user!.userId, (response: { chats?: IUserChat[] }) => {
+    socket.emit('getUserChats', authStore.user!.id, (response: { chats?: IUserChat[] }) => {
       if (!response?.chats) {
         reject(new Error('Нет чатов в ответе'));
       } else {

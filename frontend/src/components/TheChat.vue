@@ -8,19 +8,19 @@ import RightPanel from '@/components/RightPanel.vue';
 import type { IUserData } from '@/types/interfaces';
 
 const userSelectedData = ref<IUserData | null>(null);
-const userChats = ref([]);
 const chatMessages = ref([]);
+const loadUserChats = ref();
 
 const handleUserSelectedData = (data: IUserData): void => {
   userSelectedData.value = data;
 };
 
-const handleUserChats = (data): void => {
-  userChats.value = data;
-};
-
 const handleChatMessages = (data): void => {
   chatMessages.value = data;
+};
+
+const handleLoadUserChats = (): void => {
+  loadUserChats.value?.loadUserChats();
 };
 </script>
 
@@ -31,14 +31,16 @@ const handleChatMessages = (data): void => {
         ><LeftPanel
           @userSelectedData="handleUserSelectedData"
           @chatMessages="handleChatMessages"
-          :userChats="userChats"
+          ref="loadUserChats"
       /></Pane>
       <Pane class="right-panel"
         ><RightPanel
-          @userChats="handleUserChats"
-          :chatMessages="chatMessages"
           :userSelectedData="userSelectedData"
-      /></Pane>
+          :chatMessages="chatMessages"
+          @loadUserChats="handleLoadUserChats"
+        />
+        /></Pane
+      >
     </Splitpanes>
   </div>
 </template>

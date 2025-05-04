@@ -8,6 +8,7 @@
   border-bottom: 1px solid #dee2e6;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: 100%;
+  padding: 10px;
 
   .header__user-panel {
     display: flex;
@@ -16,8 +17,6 @@
   .header__logout-button {
     border: none;
     background: #c571f8;
-    border-left: 1px solid rgb(136, 71, 176);
-    height: 59px;
     width: 40px;
     margin-left: 10px;
 

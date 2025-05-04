@@ -1,12 +1,12 @@
 export interface IUserData {
-  userId: number;
+  id: number;
   userName: string;
   email: string;
   colorAvatar: string;
 }
 
 export interface IMessage {
-  userId: number;
+  id: number;
   text: string;
   createdAt: string;
 }
@@ -17,5 +17,6 @@ export interface IUserChat {
   users: {
     id: number;
     userName: string;
+    colorAvatar: string;
   }[];
 }

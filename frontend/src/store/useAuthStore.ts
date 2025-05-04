@@ -16,7 +16,7 @@ export const useAuthStore = defineStore('auth', {
 
       if (decoded) {
         this.user = {
-          userId: decoded.userId,
+          id: decoded.id,
           userName: decoded.userName,
           email: decoded.email,
           colorAvatar: decoded.colorAvatar,
