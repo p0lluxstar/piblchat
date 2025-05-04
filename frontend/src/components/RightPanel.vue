@@ -15,6 +15,7 @@ import { useSelectedChatStore } from '@/store/useSelectedChatStore';
 import type { IUserData } from '@/types/interfaces';
 import { useEmojiInsertione } from '@/utils/addEmojiToMessage';
 import { formatDay, formatTime, showDate } from '@/utils/formatDate';
+import ConfirmModal from './ConfirmModal.vue';
 import IconDeleteChat from './icons/IconDeleteChat.vue';
 import IconSendMessage from './icons/IconSendMessage.vue';
 
@@ -32,6 +33,7 @@ const messageText = ref('');
 const chatMessages = ref([...props.chatMessages]);
 const messagesContainer = ref<HTMLDivElement | null>(null);
 const { addEmojiToMessage } = useEmojiInsertione(messageText);
+const showDeleteConfirm = ref(false);
 
 watch(
   [(): any => props.chatMessages, (): any => props.userSelectedData],
@@ -76,12 +78,6 @@ const sendMessage = async (): Promise<void> => {
   scrollToBottom();
 };
 
-const handleDeleteChat = (): void => {
-  // if (!selectedChatId.value) return;
-
-  // socketEmitDeleteChat(selectedChatId.value);
-};
-
 const handleKeyEnter = (event: KeyboardEvent): void => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
@@ -98,6 +94,16 @@ const scrollToBottom = (): void => {
       });
     }
   });
+};
+
+const handleDeleteChat = (): void => {
+  showDeleteConfirm.value = true;
+};
+
+const confirmDelete = (): void => {
+  if (!selectedChatId.value) return;
+  socketEmitDeleteChat(selectedChatId.value);
+  showDeleteConfirm.value = false;
 };
 
 watch(chatMessages, scrollToBottom, { deep: true });
@@ -152,6 +158,14 @@ onUnmounted(() => {
           <button @click="handleDeleteChat()" class="right-panel__delete-button">
             <IconDeleteChat />
           </button>
+          <ConfirmModal
+            :show="showDeleteConfirm"
+            title="Удалить чат?"
+            message="Вы уверены, что хотите удалить этот чат? Это действие нельзя отменить."
+            confirm-text="Удалить"
+            @confirm="confirmDelete"
+            @cancel="showDeleteConfirm = false"
+          />
         </div>
       </div>
       <div v-if="chatMessages.length === 0" class="right-panel__empty-chat">
