@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import '@/assets/styles/components/RightPanel.scss';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import TheEmoji from '@/components/TheEmoji.vue';
 import UserBadge from '@/components/UserBadge.vue';
 import { socket } from '@/socket';
 import {
@@ -12,6 +13,7 @@ import {
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSelectedChatStore } from '@/store/useSelectedChatStore';
 import type { IUserData } from '@/types/interfaces';
+import { useEmojiInsertione } from '@/utils/addEmojiToMessage';
 import { formatDay, formatTime, showDate } from '@/utils/formatDate';
 import IconDeleteChat from './icons/IconDeleteChat.vue';
 import IconSendMessage from './icons/IconSendMessage.vue';
@@ -21,6 +23,7 @@ const props = defineProps<{
   chatMessages: any[];
 }>();
 
+const emit = defineEmits(['loadUserChats']);
 const authStore = useAuthStore();
 const selectedChatStore = useSelectedChatStore();
 const selectedUser = ref(props.userSelectedData);
@@ -28,7 +31,7 @@ const selectedChatId = computed(() => selectedChatStore.selectedChatId);
 const messageText = ref('');
 const chatMessages = ref([...props.chatMessages]);
 const messagesContainer = ref<HTMLDivElement | null>(null);
-const emit = defineEmits(['loadUserChats']);
+const { addEmojiToMessage } = useEmojiInsertione(messageText);
 
 watch(
   [(): any => props.chatMessages, (): any => props.userSelectedData],
@@ -40,7 +43,7 @@ watch(
 );
 
 const sendMessage = async (): Promise<void> => {
-  // if (!messageText.value.trim() || !props.userSelectedData) return;
+  if (!messageText.value.trim() || !props.userSelectedData) return;
 
   if (!socket?.connected) return console.warn('Соединение не установлено');
 
@@ -74,9 +77,9 @@ const sendMessage = async (): Promise<void> => {
 };
 
 const handleDeleteChat = (): void => {
-  if (!selectedChatId.value) return;
+  // if (!selectedChatId.value) return;
 
-  socketEmitDeleteChat(selectedChatId.value);
+  // socketEmitDeleteChat(selectedChatId.value);
 };
 
 const handleKeyEnter = (event: KeyboardEvent): void => {
@@ -182,6 +185,7 @@ onUnmounted(() => {
         </div>
       </div>
       <div class="right-panel__input">
+        <TheEmoji @select-emoji="addEmojiToMessage" />
         <textarea
           v-model="messageText"
           placeholder="Введите сообщение..."
