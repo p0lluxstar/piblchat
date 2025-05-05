@@ -36,6 +36,10 @@
   @include form-input;
 }
 
+.registration-form__input-error {
+  @include form-input-error;
+}
+
 .registration-form__button {
   @include form-button;
 }

@@ -27,3 +27,11 @@ export interface IActiveChats {
   colorAvatar: string;
   chatId: number;
 }
+
+export interface RegistrationAndLoginPayload {
+  userName?: string;
+  email: string;
+  password: string;
+  roleId: number;
+  colorAvatar?: string;
+}

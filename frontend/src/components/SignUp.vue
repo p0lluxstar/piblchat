@@ -1,24 +1,22 @@
 <script setup lang="ts">
-import Cookies from 'js-cookie';
-import { ref } from 'vue';
-import router from '@/router';
-import { connectSocket } from '@/socket';
-import { useAuthStore } from '@/store/useAuthStore';
+import { useField, useForm } from 'vee-validate';
+import { fetchAuth } from '@/utils/fetchAuth';
 import { generateRandomColor } from '@/utils/generateRandomColor';
+import { registrationSchema } from '@/yup/validationSchema';
+import FormLoader from './FormLoader.vue';
 
-const username = ref('');
-const email = ref('');
-const password = ref('');
-const isLoading = ref(false);
-const isError = ref(false);
-const errorMessage = ref('');
-const authStore = useAuthStore();
+const { isLoading, isError, errorMessage, submit } = fetchAuth('http://localhost:3000/users');
 
-const handleSubmit = async (): Promise<void> => {
-  isLoading.value = true;
-  isError.value = false;
-  errorMessage.value = '';
+const { handleSubmit, errors } = useForm({
+  validationSchema: registrationSchema,
+});
 
+const { value: username } = useField('username');
+const { value: email } = useField('email');
+const { value: password } = useField('password');
+const { value: confirmPassword } = useField('confirmPassword');
+
+const onSubmit = handleSubmit(async () => {
   const payload = {
     userName: username.value,
     email: email.value,
@@ -26,92 +24,59 @@ const handleSubmit = async (): Promise<void> => {
     roleId: 2,
     colorAvatar: generateRandomColor(),
   };
-
-  try {
-    const response = await fetch('http://192.168.22.120:3000/users', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      isError.value = true;
-      errorMessage.value = data.message;
-      throw new Error(data.message);
-    }
-
-    // ✅ Сохраняем токен в куки при успешной регистрации
-    if (data.token) {
-      Cookies.set('auth_token', data.token, {
-        expires: 7, // Срок жизни 7 дней
-        secure: import.meta.env.PROD, // HTTPS в production
-        sameSite: 'strict',
-        path: '/',
-      });
-    }
-
-    authStore.singUp();
-    router.push('/chat');
-    connectSocket();
-  } catch (error) {
-    console.error('Error during registration:', error);
-  }
-};
+  await submit(payload);
+});
 </script>
 
 <template>
   <div class="registration-form-layout">
     <div class="registration-container">
       <router-link to="/" class="registration-main-link">❮</router-link>
-      <h1 class="registration-form__title">Registration Form</h1>
-      <form @submit.prevent="handleSubmit" class="registration-form__form">
+      <h1 class="registration-form__title">Форма регистрации</h1>
+      <form @submit.prevent="onSubmit" class="registration-form__form">
         <div class="registration-form__input-group">
           <div class="registration-form__input-group-item">
-            <label for="username" class="registration-form__label">Username</label>
-            <input
-              type="text"
-              id="username"
-              v-model="username"
-              class="registration-form__input"
-              required
-            />
+            <label for="username" class="registration-form__label">Логин</label>
+            <input type="text" id="username" v-model="username" class="registration-form__input" />
+            <span class="registration-form__input-error">{{ errors.username }}</span>
           </div>
           <div class="registration-form__input-group-item">
-            <label for="email" class="registration-form__label">E-mail</label>
-            <input
-              type="text"
-              id="email"
-              v-model="email"
-              class="registration-form__input"
-              required
-            />
+            <label for="email" class="registration-form__label">Почта</label>
+            <input type="text" id="email" v-model="email" class="registration-form__input" />
+            <span class="registration-form__input-error">{{ errors.email }}</span>
           </div>
           <div class="registration-form__input-group-item">
-            <label for="password" class="registration-form__label">Password</label>
+            <label for="password" class="registration-form__label">Пароль</label>
             <input
               type="password"
               id="password"
               v-model="password"
               class="registration-form__input"
-              required
             />
+            <span class="registration-form__input-error">{{ errors.password }}</span>
           </div>
           <div class="registration-form__input-group-item">
-            <label for="password" class="registration-form__label">Password</label>
+            <label for="confirmPassword" class="registration-form__label">Повторите пароль</label>
             <input
               type="password"
-              id="password"
-              v-model="password"
+              id="confirmPassword"
+              v-model="confirmPassword"
               class="registration-form__input"
-              required
             />
+            <span class="registration-form__input-error">{{ errors.confirmPassword }}</span>
           </div>
         </div>
-        <button class="registration-form__button" type="submit">Register</button>
+        <button
+          :disabled="isLoading"
+          :class="{ loading: isLoading }"
+          class="registration-form__button"
+          type="submit"
+        >
+          <span v-if="!isLoading">Зарегистрироваться</span>
+          <template v-else>
+            <FormLoader />
+          </template>
+        </button>
         <div v-if="isError" class="registration-form__error">{{ errorMessage }}</div>
       </form>
     </div>

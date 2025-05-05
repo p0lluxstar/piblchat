@@ -21,6 +21,12 @@
     }
   }
 
+  .left-panel__search-results,
+  .left-panel__chats-list{
+    overflow: auto;
+    height: calc(100vh - 120px);
+  }
+
   .left-panel__user-button {
     display: flex;
     justify-content: space-between;

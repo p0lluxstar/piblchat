@@ -13,11 +13,11 @@
 
 @mixin form-container {
   width: 100%;
-  max-width: 500px;
+  max-width: 450px;
   background: white;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  padding: 40px;
+  padding: 30px;
   position: relative;
 }
 
@@ -50,7 +50,8 @@
   font-size: 28px;
   font-weight: 600;
   color: #2d3748;
-  margin-bottom: 30px;
+  margin-top: 0px;
+  margin-bottom: 20px;
   text-align: center;
 
   @media (max-width: 600px) {
@@ -62,7 +63,7 @@
 @mixin form {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 10px;
 
   @media (max-width: 600px) {
     padding: 30px 20px;
@@ -73,13 +74,14 @@
 @mixin form-input-group {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
 }
 
 @mixin form-input-group-item {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 @mixin form-label {
@@ -103,6 +105,14 @@
   }
 }
 
+@mixin form-input-error {
+  position: absolute;
+  bottom: -16px;
+  right: 5px;
+  color: #f66d6d;
+  font-size: 14px;
+}
+
 @mixin form-button {
   padding: 14px;
   background-color: #c571f8;
@@ -113,7 +123,8 @@
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.3s;
-  margin-top: 10px;
+  margin-top: 24px;
+  height: 48px;
 
   &:hover {
     background-color: #b45ef0;
@@ -122,14 +133,20 @@
   &:active {
     background-color: #9d4fd9;
   }
+
+  &:disabled {
+    opacity: 0.8;
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+  }
 }
 
 @mixin form-error {
   color: #ef4444;
   font-size: 14px;
   text-align: center;
-  margin-top: 10px;
-  padding: 10px;
+  padding: 14px;
   background-color: #fee2e2;
   border-radius: 6px;
 }

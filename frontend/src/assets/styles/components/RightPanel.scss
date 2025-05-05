@@ -63,7 +63,7 @@
     .right-panel__messages {
       padding: 20px 20px 0px 20px;
       height: 100%;
-      overflow-y: overlay;
+      overflow: auto;
 
       .right-panel__message {
         width: 60%;

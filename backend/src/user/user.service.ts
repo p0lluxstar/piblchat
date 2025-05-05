@@ -35,7 +35,7 @@ export class UserService {
         userName: true,
         colorAvatar: true,
       },
-      take: 5, // ограничиваем количество результатов до 5
+      take: 10, // ограничиваем количество результатов до 10
     });
   }
 
