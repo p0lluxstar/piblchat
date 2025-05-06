@@ -7,7 +7,6 @@ export class ChatService {
   constructor(private prisma: PrismaService) {}
 
   async createChat(userOneId: number, userTwoId: number): Promise<Chat> {
-    // Создаем новый чат с двумя участниками
     const chat = await this.prisma.chat.create({
       data: {
         users: {

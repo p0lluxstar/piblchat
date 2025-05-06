@@ -3,14 +3,15 @@ import { ref } from 'vue';
 import router from '@/router';
 import { connectSocket } from '@/socket';
 import { useAuthStore } from '@/store/useAuthStore';
+import type { IUseFetchAuthReturn, TAuthPayload } from '@/types';
 
-export function fetchAuth(url: string): any {
+export function fetchAuth(url: string): IUseFetchAuthReturn {
   const isLoading = ref(false);
   const isError = ref(false);
   const errorMessage = ref('');
   const authStore = useAuthStore();
 
-  const submit = async (payload: Record<string, any>): Promise<boolean> => {
+  const submit = async (payload: TAuthPayload): Promise<boolean> => {
     isLoading.value = true;
     isError.value = false;
     errorMessage.value = '';

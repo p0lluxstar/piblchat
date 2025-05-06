@@ -39,7 +39,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // Отключение клиента
   async handleDisconnect(client: Socket) {
-    const userId = [...this.userSockets.entries()].find(([_, id]) => id === client.id)?.[0];
+    // ищим socketId
+    const userId = [...this.userSockets.entries()].find(
+      ([, socketId]) => socketId === client.id
+    )?.[0];
 
     if (userId) {
       this.userSockets.delete(userId);
@@ -61,7 +64,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         userIds.forEach((id) => {
           const socketId = this.userSockets.get(id);
-          console.log('socketId', socketId);
+
           if (socketId) {
             this.server.to(socketId).emit('create-chat', {
               chatId: chat.id,
@@ -127,7 +130,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleGetMyRooms(client: Socket, userId: number) {
     const chats = await this.chatService.findChatByUserId(userId);
 
-    return { chats };
+    return chats;
   }
 
   @SubscribeMessage('get-messages-chat')

@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import { defineStore } from 'pinia';
-import type { IUserData } from '@/types/interfaces';
+import type { IUserData } from '@/types';
 import { decodeToken } from '@/utils/decodeToken';
 
 export const useAuthStore = defineStore('auth', {

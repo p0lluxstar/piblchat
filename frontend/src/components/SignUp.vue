@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useField, useForm } from 'vee-validate';
+import type { IRegistrationPayload } from '@/types';
 import { fetchAuth } from '@/utils/fetchAuth';
 import { generateRandomColor } from '@/utils/generateRandomColor';
 import { registrationSchema } from '@/yup/validationSchema';
@@ -11,13 +12,13 @@ const { handleSubmit, errors } = useForm({
   validationSchema: registrationSchema,
 });
 
-const { value: username } = useField('username');
-const { value: email } = useField('email');
-const { value: password } = useField('password');
+const { value: username } = useField<string>('username');
+const { value: email } = useField<string>('email');
+const { value: password } = useField<string>('password');
 const { value: confirmPassword } = useField('confirmPassword');
 
 const onSubmit = handleSubmit(async () => {
-  const payload = {
+  const payload: IRegistrationPayload = {
     userName: username.value,
     email: email.value,
     password: password.value,

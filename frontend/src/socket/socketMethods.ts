@@ -1,6 +1,6 @@
 import { socket } from '@/socket';
 import { useAuthStore } from '@/store/useAuthStore';
-import type { IMessage } from '@/types/interfaces';
+import type { IDataActiveChat, IMessagesChat } from '@/types';
 
 export const socketEmitCreateChat = (userOneId: number, userTwoId: number): void => {
   if (!socket) return;
@@ -41,27 +41,29 @@ export const socketOnceStartChatResponse = (
   userOneId: number,
   userTwoId: number,
   text: string
-): Promise<any> => {
+): Promise<{ chatId: number; sucsess: boolean } | null> => {
   return new Promise((resolve) => {
-    if (!socket) return resolve(undefined);
+    if (!socket) return resolve(null);
 
     const authStore = useAuthStore();
 
     socket.once('create-chat-response', (data) => {
       if (data.success) {
         socketEmitJoinChat(data.chatId);
-        socketEmitSendMessage(userOneId, userTwoId, authStore.user?.id, text, data.chatId);
+        if (authStore.user?.id !== undefined) {
+          socketEmitSendMessage(userOneId, userTwoId, authStore.user.id, text, data.chatId);
+        }
       }
       resolve(data);
     });
   });
 };
 
-export const socketEmitGetUserChats = (userId: number): Promise<any> => {
+export const socketEmitGetUserChats = (userId: number): Promise<IDataActiveChat[] | null> => {
   return new Promise((resolve) => {
-    if (!socket) return resolve(undefined);
+    if (!socket) return resolve(null);
 
-    socket.emit('get-user-chats', userId, (data: any) => {
+    socket.emit('get-user-chats', userId, (data: IDataActiveChat[]) => {
       resolve(data);
     });
   });
@@ -74,13 +76,12 @@ export const socketEmitDeleteChat = (chatId: number): void => {
   });
 };
 
-export const socketEmitGetMessagesChat = (userId: number): Promise<any> => {
+export const socketEmitGetMessagesChat = (userId: number): Promise<IMessagesChat[] | null> => {
   return new Promise((resolve) => {
-    if (!socket) return resolve(undefined);
+    if (!socket) return resolve(null);
 
-    socket.emit('get-messages-chat', { chatId: userId }, (chatMessages: IMessage[]) => {
-      //   const chatMessages = messages.map((message) => message.text);
-      resolve(chatMessages);
+    socket.emit('get-messages-chat', { chatId: userId }, (messagesChat: IMessagesChat[]) => {
+      resolve(messagesChat);
     });
   });
 };

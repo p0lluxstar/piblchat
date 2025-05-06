@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useField, useForm } from 'vee-validate';
+import type { ILoginPayload } from '@/types';
 import { fetchAuth } from '@/utils/fetchAuth';
 import { loginSchema } from '@/yup/validationSchema';
 import FormLoader from './FormLoader.vue';
@@ -10,11 +11,11 @@ const { handleSubmit, errors } = useForm({
   validationSchema: loginSchema,
 });
 
-const { value: email } = useField('email');
-const { value: password } = useField('password');
+const { value: email } = useField<string>('email');
+const { value: password } = useField<string>('password');
 
 const onSubmit = handleSubmit(async () => {
-  const payload = {
+  const payload: ILoginPayload = {
     email: email.value,
     password: password.value,
   };

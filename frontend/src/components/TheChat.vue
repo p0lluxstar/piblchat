@@ -5,18 +5,18 @@ import { Pane, Splitpanes } from 'splitpanes';
 import { ref } from 'vue';
 import LeftPanel from '@/components/LeftPanel.vue';
 import RightPanel from '@/components/RightPanel.vue';
-import type { IUserData } from '@/types/interfaces';
+import type { IMessagesChat, IUserData } from '@/types';
 
 const userSelectedData = ref<IUserData | null>(null);
-const chatMessages = ref([]);
+const messagesChat = ref<IMessagesChat[] | null>(null);
 const loadUserChats = ref();
 
 const handleUserSelectedData = (data: IUserData): void => {
   userSelectedData.value = data;
 };
 
-const handleChatMessages = (data): void => {
-  chatMessages.value = data;
+const handleChatMessages = (data: IMessagesChat[]): void => {
+  messagesChat.value = data;
 };
 
 const handleLoadUserChats = (): void => {
@@ -30,13 +30,13 @@ const handleLoadUserChats = (): void => {
       <Pane :size="20" :min-size="15" :max-size="30"
         ><LeftPanel
           @userSelectedData="handleUserSelectedData"
-          @chatMessages="handleChatMessages"
+          @messagesChat="handleChatMessages"
           ref="loadUserChats"
       /></Pane>
       <Pane class="right-panel"
         ><RightPanel
           :userSelectedData="userSelectedData"
-          :chatMessages="chatMessages"
+          :messagesChat="messagesChat"
           @loadUserChats="handleLoadUserChats"
         />
         /></Pane

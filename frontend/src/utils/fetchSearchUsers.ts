@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import type { IUserData } from '@/types/interfaces';
+import type { IUserData } from '@/types';
 
 export async function fetchSearchUsers(query: string): Promise<IUserData[] | []> {
   if (query.trim().length === 0) return [];

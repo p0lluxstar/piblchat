@@ -1,5 +1,5 @@
 import { Controller, Delete, Get, Query, UseGuards } from '@nestjs/common';
-import { Chat, User } from '@prisma/client';
+import { Chat } from '@prisma/client';
 import { AuthGuard } from '../user/guards/auth.guard';
 import { ChatService } from './chat.service';
 
@@ -8,6 +8,7 @@ export class ChatController {
   constructor(private readonly userService: ChatService) {}
 
   @Get()
+  @UseGuards(AuthGuard)
   async temp(): Promise<string> {
     return 'chat';
   }
@@ -19,7 +20,9 @@ export class ChatController {
   }
 
   @Delete('delete')
-  async deleteChatByChatId(@Query('chatId') chatId: string): Promise<any> {
-    return this.userService.deleteChatAndMessages(Number(chatId));
+  @UseGuards(AuthGuard)
+  async deleteChatByChatId(@Query('chatId') chatId: string): Promise<{ success: boolean }> {
+    await this.userService.deleteChatAndMessages(Number(chatId));
+    return { success: true };
   }
 }

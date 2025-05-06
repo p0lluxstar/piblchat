@@ -1,4 +1,4 @@
-import type { IMessage } from '@/types/interfaces';
+import type { IMessagesChat } from '@/types';
 
 export const formatTime = (date: string | Date): string => {
   const d = new Date(date);
@@ -30,11 +30,11 @@ export const isSameDay = (date1: Date, date2: Date): boolean => {
   );
 };
 
-export const showDate = (index: number, chatMessages: IMessage[]): boolean => {
+export const showDate = (index: number, messagesChat: IMessagesChat[]): boolean => {
   if (index === 0) return true;
 
-  const current = new Date(chatMessages[index].createdAt);
-  const previous = new Date(chatMessages[index - 1].createdAt);
+  const current = new Date(messagesChat[index].createdAt);
+  const previous = new Date(messagesChat[index - 1].createdAt);
 
   return !isSameDay(current, previous);
 };

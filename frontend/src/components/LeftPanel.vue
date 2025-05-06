@@ -6,19 +6,19 @@ import { socketEmitGetMessagesChat } from '@/socket/socketMethods';
 import { useActiveChatsStore } from '@/store/useActiveChatsStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSelectedChatStore } from '@/store/useSelectedChatStore';
-import type { IUserChat, IUserData } from '@/types/interfaces';
+import type { IDataActiveChat, IUserData, IUserDataActiveChats } from '@/types';
 import { fetchSearchUsers } from '@/utils/fetchSearchUsers';
 import IconChatStatus from './icons/IconChatStatus.vue';
 import UserBadge from './UserBadge.vue';
 
-const emit = defineEmits(['userSelectedData', 'chatMessages']);
+const emit = defineEmits(['userSelectedData', 'messagesChat']);
 const authStore = useAuthStore();
 const selectedChatStore = useSelectedChatStore();
 const searchUserNameQuery = ref('');
 const searchUsers = ref<IUserData[]>([]);
 const selectedUser = ref<IUserData | null>(null);
 const isSearchActive = ref(false);
-const userChats = ref<IUserChat[]>([]);
+const dataActiveChats = ref<IDataActiveChat[]>([]);
 const activeChatsStore = useActiveChatsStore();
 const savedActiveChats = computed(() => activeChatsStore.activeChats);
 let debounceTimeout: ReturnType<typeof setTimeout>;
@@ -48,22 +48,24 @@ const handleUserSelect = (user: IUserData & { chatId?: number }): void => {
     if (socket) {
       socketEmitJoinChat(foundChat.chatId);
 
-      socketEmitGetMessagesChat(foundChat.chatId).then((chatMessages) => {
-        emit('chatMessages', chatMessages);
+      socketEmitGetMessagesChat(foundChat.chatId).then((messagesChat) => {
+        emit('messagesChat', messagesChat);
       });
     }
   }
 
   emit('userSelectedData', user);
-  emit('chatMessages', []);
+  emit('messagesChat', []);
   selectedUser.value = user;
   searchUserNameQuery.value = '';
   searchUsers.value = [];
 };
 
-const getUsersChat = (userChat: IUserChat[]): any => {
+const getUsersChat = (userChat: IDataActiveChat[]): IUserDataActiveChats[] => {
   const myUserId = authStore.user?.id;
-  const activeChats = userChat.flatMap((chat) =>
+
+  // массив данных пользователей с кем есть чат
+  const listUsersActiveChat = userChat.flatMap((chat) =>
     chat.users
       .filter((user) => user.id !== myUserId)
       .map((user) => ({
@@ -72,20 +74,23 @@ const getUsersChat = (userChat: IUserChat[]): any => {
       }))
   );
 
-  activeChatsStore.setChats(activeChats);
+  activeChatsStore.setChats(listUsersActiveChat);
 
-  return activeChats;
+  return listUsersActiveChat;
 };
 
 const loadUserChats = async (): Promise<void> => {
   try {
+    if (!authStore.user) return;
+
     const response = await socketEmitGetUserChats(authStore.user?.id);
-    if (response?.chats) {
-      userChats.value = response.chats;
+
+    if (response) {
+      dataActiveChats.value = response;
     }
   } catch (error) {
     console.error('Failed to load chats:', error);
-    userChats.value = [];
+    dataActiveChats.value = [];
   }
 };
 
@@ -96,7 +101,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  // очищаем при размонтировании
   activeChatsStore.clearChats();
 });
 </script>
@@ -127,8 +131,12 @@ onUnmounted(() => {
       </div>
     </div>
     <div v-if="!searchUserNameQuery" class="left-panel__chats">
-      <ul v-if="userChats.length" class="left-panel__chats-list">
-        <li v-for="user in getUsersChat(userChats)" :key="user.id" class="left-panel__chats-item">
+      <ul v-if="dataActiveChats.length" class="left-panel__chats-list">
+        <li
+          v-for="user in getUsersChat(dataActiveChats)"
+          :key="user.id"
+          class="left-panel__chats-item"
+        >
           <button
             @click="handleUserSelect(user)"
             :class="[

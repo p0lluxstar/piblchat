@@ -16,6 +16,7 @@ export const connectSocket = (): Socket => {
     });
 
     socket.on('connect', () => {
+      if (!socket) return;
       console.log('Socket подключён:', socket.id);
     });
 

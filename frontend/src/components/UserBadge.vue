@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IUserData } from '@/types/interfaces';
+import type { IUserData } from '@/types';
 
 const props = defineProps<{
   userData: IUserData;

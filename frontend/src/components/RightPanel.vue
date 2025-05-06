@@ -13,7 +13,7 @@ import {
 import { useActiveChatsStore } from '@/store/useActiveChatsStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSelectedChatStore } from '@/store/useSelectedChatStore';
-import type { IUserData } from '@/types/interfaces';
+import type { IMessagesChat, IUserData } from '@/types';
 import { useEmojiInsertione } from '@/utils/addEmojiToMessage';
 import { formatDay, formatTime, showDate } from '@/utils/formatDate';
 import ConfirmModal from './ConfirmModal.vue';
@@ -22,7 +22,7 @@ import IconSendMessage from './icons/IconSendMessage.vue';
 
 const props = defineProps<{
   userSelectedData: IUserData | null;
-  chatMessages: any[];
+  messagesChat: IMessagesChat[] | null;
 }>();
 
 const emit = defineEmits(['loadUserChats']);
@@ -31,16 +31,19 @@ const selectedChatStore = useSelectedChatStore();
 const selectedUser = ref(props.userSelectedData);
 const selectedChatId = computed(() => selectedChatStore.selectedChatId);
 const messageText = ref('');
-const chatMessages = ref([...props.chatMessages]);
+const messagesChat = ref([...(props.messagesChat || [])]);
 const messagesContainer = ref<HTMLDivElement | null>(null);
 const { addEmojiToMessage } = useEmojiInsertione(messageText);
 const showDeleteConfirm = ref(false);
 const activeChatsStore = useActiveChatsStore();
 
 watch(
-  [(): any => props.chatMessages, (): any => props.userSelectedData],
+  [
+    (): IMessagesChat[] | null => props.messagesChat,
+    (): IUserData | null => props.userSelectedData,
+  ],
   ([newMessages, newUserData]) => {
-    chatMessages.value = [...newMessages];
+    messagesChat.value = [...(newMessages || [])];
     selectedUser.value = newUserData;
   },
   { deep: true }
@@ -51,7 +54,9 @@ const sendMessage = async (): Promise<void> => {
 
   if (!socket?.connected) return console.warn('Соединение не установлено');
 
-  if (!chatMessages.value.length) {
+  if (!authStore.user) return;
+
+  if (!messagesChat.value.length) {
     socketEmitCreateChat(authStore.user.id, props.userSelectedData.id);
 
     const startChatResponse = await socketOnceStartChatResponse(
@@ -60,19 +65,21 @@ const sendMessage = async (): Promise<void> => {
       messageText.value
     );
 
+    console.log('startChatResponse', startChatResponse);
+
     if (startChatResponse) {
       emit('loadUserChats');
       selectedChatStore.selectedChatId = startChatResponse.chatId;
     }
   }
 
-  if (chatMessages.value.length) {
+  if (messagesChat.value.length) {
     socketEmitSendMessage(
       authStore.user?.id,
       props.userSelectedData?.id,
       authStore.user?.id,
       messageText.value,
-      selectedChatId.value
+      selectedChatId.value!
     );
   }
 
@@ -110,7 +117,7 @@ const confirmDelete = (): void => {
   selectedChatStore.clearSelectedChat();
 };
 
-watch(chatMessages, scrollToBottom, { deep: true });
+watch(messagesChat, scrollToBottom, { deep: true });
 
 onMounted(scrollToBottom);
 
@@ -119,7 +126,7 @@ onMounted(() => {
 
   socket.on('new-message', (data) => {
     if (selectedChatStore.selectedChatId === data.chatId) {
-      chatMessages.value.push(data);
+      messagesChat.value.push(data);
       return;
     }
   });
@@ -158,7 +165,7 @@ onUnmounted(() => {
     <div v-else class="right-panel__chat-container">
       <div class="right-panel__chart-header">
         <UserBadge :userData="selectedUser" />
-        <div v-if="chatMessages.length" class="right-panel__delete-chat">
+        <div v-if="messagesChat.length" class="right-panel__delete-chat">
           <button @click="handleDeleteChat()" class="right-panel__delete-button">
             <IconDeleteChat />
           </button>
@@ -172,12 +179,12 @@ onUnmounted(() => {
           />
         </div>
       </div>
-      <div v-if="chatMessages.length === 0" class="right-panel__empty-chat">
+      <div v-if="messagesChat.length === 0" class="right-panel__empty-chat">
         Отправьте первое сообщение
       </div>
       <div ref="messagesContainer" class="right-panel__messages">
-        <div v-for="(message, index) in chatMessages" :key="index" class="right-panel__message">
-          <div v-if="showDate(index, chatMessages)" class="right-panel__date-container">
+        <div v-for="(message, index) in messagesChat" :key="index" class="right-panel__message">
+          <div v-if="showDate(index, messagesChat)" class="right-panel__date-container">
             <span class="right-panel__date">{{ formatDay(message.createdAt) }}</span>
           </div>
           <div class="right-panel__message-content">

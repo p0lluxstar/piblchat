@@ -114,7 +114,7 @@ export class UserService {
     }
 
     // Копируем все поля, кроме пароля
-    const updatedData: any = { ...data };
+    const updatedData = { ...data };
 
     // Если в запросе есть новый пароль — хешируем его
     if (data.password) {

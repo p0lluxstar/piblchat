@@ -1,5 +1,5 @@
 import { jwtDecode } from 'jwt-decode';
-import { type IUserData } from '../types/interfaces';
+import { type IUserData } from '../types';
 
 export function decodeToken(token: string): IUserData | null {
   try {

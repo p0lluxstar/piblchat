@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia';
-import type { IActiveChats } from '@/types/interfaces';
+import type { IUserDataActiveChats } from '@/types';
 
 export const useActiveChatsStore = defineStore('chat', {
   state: () => ({
-    activeChats: [] as IActiveChats[],
+    activeChats: [] as IUserDataActiveChats[],
   }),
   actions: {
-    setChats(activeChats: IActiveChats[]) {
+    setChats(activeChats: IUserDataActiveChats[]) {
       this.activeChats = activeChats;
     },
     removeChatById(chatId: number) {

@@ -43,7 +43,7 @@ onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
 });
 
-const togglePicker = (): void => {
+const togglePicker = (event: MouseEvent): void => {
   event.stopPropagation();
   showPicker.value = !showPicker.value;
 };
@@ -56,7 +56,7 @@ const insertEmoji = (emoji: string): void => {
 
 <template>
   <div class="emoji-container">
-    <button @click="togglePicker" class="emoji__button"><IconSmile /></button>
+    <button @click="togglePicker($event)" class="emoji__button"><IconSmile /></button>
     <div v-if="showPicker" ref="pickerRef" class="emoji__picker">
       <button
         v-for="(emoji, index) in emojis"
