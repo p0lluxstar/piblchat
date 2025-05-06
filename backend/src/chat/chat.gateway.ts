@@ -33,7 +33,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (userId) {
       this.userSockets.set(userId, client.id);
-      console.log(`User id: ${userId} connected with socket ${client.id}`);
+      // console.log(`User id: ${userId} connected with socket ${client.id}`);
     }
   }
 
@@ -46,7 +46,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (userId) {
       this.userSockets.delete(userId);
-      console.log(`User ${userId} disconnected`);
+      // console.log(`User ${userId} disconnected`);
     }
   }
 

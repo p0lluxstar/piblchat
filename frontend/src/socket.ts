@@ -17,11 +17,11 @@ export const connectSocket = (): Socket => {
 
     socket.on('connect', () => {
       if (!socket) return;
-      console.log('Socket подключён:', socket.id);
+      // console.log('Socket подключён:', socket.id);
     });
 
     socket.on('disconnect', () => {
-      console.log('Socket отключён');
+      // console.log('Socket отключён');
     });
   }
   return socket;

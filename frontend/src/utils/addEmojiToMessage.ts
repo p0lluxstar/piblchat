@@ -1,9 +1,13 @@
 import { nextTick, type Ref } from 'vue';
 
+interface EmojiInsertionAPI {
+  addEmojiToMessage: (emoji: string) => void;
+}
+
 export const useEmojiInsertione = (
   messageText: Ref<string>,
   textareaSelector = 'textarea'
-): any => {
+): EmojiInsertionAPI => {
   const addEmojiToMessage = (emoji: string): void => {
     const textarea = document.querySelector(textareaSelector) as HTMLTextAreaElement;
     if (!textarea) return;

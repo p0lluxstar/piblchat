@@ -65,8 +65,6 @@ const sendMessage = async (): Promise<void> => {
       messageText.value
     );
 
-    console.log('startChatResponse', startChatResponse);
-
     if (startChatResponse) {
       emit('loadUserChats');
       selectedChatStore.selectedChatId = startChatResponse.chatId;
