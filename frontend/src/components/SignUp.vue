@@ -4,9 +4,10 @@ import type { IRegistrationPayload } from '@/types';
 import { fetchAuth } from '@/utils/fetchAuth';
 import { generateRandomColor } from '@/utils/generateRandomColor';
 import { registrationSchema } from '@/yup/validationSchema';
-import FormLoader from './FormLoader.vue';
+import TheLoader from './TheLoader.vue';
+const apiUrl = import.meta.env.VITE_API_URL;
 
-const { isLoading, isError, errorMessage, submit } = fetchAuth('http://localhost:3000/users');
+const { isLoading, isError, errorMessage, submit } = fetchAuth(`${apiUrl}/users`);
 
 const { handleSubmit, errors } = useForm({
   validationSchema: registrationSchema,
@@ -75,7 +76,7 @@ const onSubmit = handleSubmit(async () => {
         >
           <span v-if="!isLoading">Зарегистрироваться</span>
           <template v-else>
-            <FormLoader />
+            <TheLoader backgroundColor="#ffffff" />
           </template>
         </button>
         <div v-if="isError" class="registration-form__error">{{ errorMessage }}</div>

@@ -78,12 +78,13 @@
 
         .right-panel__date {
           display: inline-block;
-          width: 220px;
-          padding: 8px 0px;
+          width: 150px;
+          padding: 6px 0px;
           border-radius: 20px;
-          background: #dfdfdf;
-          color: #505050;
+          background: #666;
+          color: #fff;
           font-weight: bold;
+          font-size: 14px;
         }
       }
 
@@ -106,10 +107,11 @@
 
           .right-panel__message-text {
             padding: 10px 15px;
-            background-color: #c571f8;
+            background-color: #9a78d8;
             border-radius: 20px 20px 5px 20px;
             color: #fff;
             max-width: 70%;
+            font-weight: 500;
           }
         }
 
@@ -122,6 +124,7 @@
             border-radius: 20px 20px 20px 5px;
             color: #505050;
             max-width: 70%;
+            font-weight: 500;
           }
         }
       }
@@ -154,7 +157,7 @@
       .right-panel__send-button {
         display: flex;
         padding: 8px;
-        background-color: #c571f8;
+        background-color: #9a78d8;
         color: white;
         border: none;
         border-radius: 4px;
@@ -167,7 +170,7 @@
         }
 
         &:hover {
-          background-color: #cd7ffd;
+          background-color: #9465e6;
         }
       }
     }

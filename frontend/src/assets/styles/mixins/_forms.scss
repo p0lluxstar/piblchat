@@ -33,7 +33,7 @@
   border-radius: 50%;
   text-decoration: none;
   background: white;
-  color: #c571f8;
+  color: #9a78d8;
   font-size: 24px;
   font-weight: bold;
 
@@ -115,7 +115,7 @@
 
 @mixin form-button {
   padding: 14px;
-  background-color: #c571f8;
+  background-color: #9a78d8;
   color: white;
   border: none;
   border-radius: 8px;
@@ -127,11 +127,11 @@
   height: 48px;
 
   &:hover {
-    background-color: #b45ef0;
+    background-color: #9465e6;
   }
 
   &:active {
-    background-color: #9d4fd9;
+    background-color: #8354d4;
   }
 
   &:disabled {

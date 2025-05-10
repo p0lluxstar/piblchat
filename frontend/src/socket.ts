@@ -1,5 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 import { useAuthStore } from './store/useAuthStore';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 export let socket: Socket | null = null;
 
@@ -8,7 +9,7 @@ export const connectSocket = (): Socket => {
   const userId = authStore.user?.id || null;
 
   if (!socket) {
-    socket = io('http://localhost:3000', {
+    socket = io(`${apiUrl}`, {
       withCredentials: true,
       query: {
         userId,

@@ -3,9 +3,10 @@ import { useField, useForm } from 'vee-validate';
 import type { ILoginPayload } from '@/types';
 import { fetchAuth } from '@/utils/fetchAuth';
 import { loginSchema } from '@/yup/validationSchema';
-import FormLoader from './FormLoader.vue';
+import TheLoader from './TheLoader.vue';
+const apiUrl = import.meta.env.VITE_API_URL;
 
-const { isLoading, isError, errorMessage, submit } = fetchAuth('http://localhost:3000/users/login');
+const { isLoading, isError, errorMessage, submit } = fetchAuth(`${apiUrl}/users/login`);
 
 const { handleSubmit, errors } = useForm({
   validationSchema: loginSchema,
@@ -49,7 +50,7 @@ const onSubmit = handleSubmit(async () => {
         >
           <span v-if="!isLoading">Авторизоваться</span>
           <template v-else>
-            <FormLoader />
+            <TheLoader backgroundColor="#ffffff" />
           </template>
         </button>
         <div v-if="isError" class="login-form__error">{{ errorMessage }}</div>
