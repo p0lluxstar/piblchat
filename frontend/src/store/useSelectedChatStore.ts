@@ -20,13 +20,5 @@ export const useSelectedChatStore = defineStore('selectedChat', {
     isChatSelected(id: number): boolean {
       return this.selectedChatId === id;
     },
-
-    getters: {
-      // Получить выбранный ID (может быть null)
-      getSelectedChatId: (state) => state.selectedChatId,
-
-      // Проверить, есть ли выбранный чат
-      hasSelectedChat: (state) => state.selectedChatId !== null,
-    },
   },
 });

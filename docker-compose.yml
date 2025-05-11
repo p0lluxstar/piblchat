@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: piblchat_db
+    restart: always
+    image: postgres
+    environment:
+      - POSTGRES_DB=${DB_DATABASE}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - db-logs:/var/log/postgresql
+    networks:
+      - piblchat
+    ports:
+      - '${DB_HOST_PORT}:${DB_PORT}'
+  backend:
+    container_name: piblchat_backend
+    restart: always
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.app
+    depends_on:
+      - db
+    environment:
+      - API_PORT=${API_PORT}
+      - API_HOST=${API_HOST}
+      - DB_CONNECTION=${DB_CONNECTION}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_PORT=${DB_PORT}
+      - DB_HOST=db
+    networks:
+      - piblchat
+    ports:
+      - '${API_PORT}:${API_PORT}'  
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.app
+    container_name: piblchat_frontend
+    restart: always
+    environment:
+      - NODE_ENV=production
+    networks:
+      - piblchat
+    ports:
+      - '${FRONTEND_HOST_PORT}:${FRONTEND_PORT}'
+
+networks:
+  piblchat:
+    driver: bridge
+
+volumes:
+  db-data:
+  db-logs:

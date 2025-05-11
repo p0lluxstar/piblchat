@@ -12,5 +12,5 @@ export const registrationSchema = yup.object({
 
 export const loginSchema = yup.object({
   email: yup.string().email('Неверный email').required('Поле обязательно'),
-  password: yup.string().min(1, 'Минимум 8 символов').required('Поле обязательно'),
+  password: yup.string().min(8, 'Минимум 8 символов').required('Поле обязательно'),
 });

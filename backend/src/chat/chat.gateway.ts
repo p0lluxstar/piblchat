@@ -12,7 +12,7 @@ import { ChatService } from './chat.service';
 
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:5173', // Точный адрес вашего фронтенда
+    origin:  process.env.ALLOWED_ORIGINS?.split(',') || [], // Точный адрес вашего фронтенда
     credentials: true, // Разрешить передачу кук/заголовков авторизации
   },
 })
