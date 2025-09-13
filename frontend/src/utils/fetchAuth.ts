@@ -35,7 +35,7 @@ export function fetchAuth(url: string): IUseFetchAuthReturn {
       if (data.token) {
         Cookies.set('auth_token', data.token, {
           expires: 7,
-          secure: import.meta.env.PROD,
+          secure: import.meta.env.PROD, // кука будет передаваться только по HTTPS
           sameSite: 'strict',
           path: '/',
         });

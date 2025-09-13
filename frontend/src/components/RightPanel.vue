@@ -11,6 +11,7 @@ import {
   socketOnceStartChatResponse,
 } from '@/socket/socketMethods';
 import { useActiveChatsStore } from '@/store/useActiveChatsStore';
+import { useActiveLeftPanelStore } from '@/store/useActiveLeftPanelStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSelectedChatStore } from '@/store/useSelectedChatStore';
 import type { IMessagesChat, IUserData } from '@/types';
@@ -18,6 +19,7 @@ import { useEmojiInsertione } from '@/utils/addEmojiToMessage';
 import { formatDay, formatTime, showDate } from '@/utils/formatDate';
 import ConfirmModal from './ConfirmModal.vue';
 import IconDeleteChat from './icons/IconDeleteChat.vue';
+import IconLeftArrow from './icons/IconLeftArrow.vue';
 import IconSendMessage from './icons/IconSendMessage.vue';
 
 const props = defineProps<{
@@ -36,6 +38,7 @@ const messagesContainer = ref<HTMLDivElement | null>(null);
 const { addEmojiToMessage } = useEmojiInsertione(messageText);
 const showDeleteConfirm = ref(false);
 const activeChatsStore = useActiveChatsStore();
+const activeLeftPanelStore = useActiveLeftPanelStore();
 
 watch(
   [
@@ -138,7 +141,7 @@ onMounted(() => {
   });
 
   socket.on('create-chat', () => {
-    // emit('loadUserChats');
+    emit('loadUserChats');
   });
 
   // emit('loadUserChats');
@@ -154,6 +157,13 @@ onUnmounted(() => {
 
 <template>
   <div class="right-panel-container">
+    <button
+      v-if="!selectedUser"
+      class="right-panel__left-arrow-icon"
+      @click="activeLeftPanelStore.trueActiveLeftPanel()"
+    >
+      <IconLeftArrow />
+    </button>
     <div v-if="!selectedUser" class="right-panel__empty-chat">
       <p class="empty-state__description">
         Начните новый диалог или выберите <br />
@@ -162,6 +172,12 @@ onUnmounted(() => {
     </div>
     <div v-else class="right-panel__chat-container">
       <div class="right-panel__chart-header">
+        <button
+          class="right-panel__header-left-arrow-icon"
+          @click="activeLeftPanelStore.trueActiveLeftPanel()"
+        >
+          <IconLeftArrow />
+        </button>
         <UserBadge :userData="selectedUser" />
         <div v-if="messagesChat.length" class="right-panel__delete-chat">
           <button @click="handleDeleteChat()" class="right-panel__delete-button">

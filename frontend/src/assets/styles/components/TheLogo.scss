@@ -24,3 +24,11 @@
     color: white;
   }
 }
+
+@media (max-width: 540px) {
+  .logo-container-auth {
+    .logo-text {
+      font-size: 1.4rem;
+    }
+  }
+}

@@ -58,7 +58,7 @@ export class UserService {
 
     if (existingUserByUserName || existingUserByEmail) {
       throw new HttpException(
-        'The user with this name or email already exists',
+        'Пользователь с таким именем или email уже существует',
         HttpStatus.UNPROCESSABLE_ENTITY
       );
     }
@@ -98,7 +98,7 @@ export class UserService {
     const isPasswordValid = user && (await bcrypt.compare(data.password, user.password));
 
     if (!isPasswordValid) {
-      throw new HttpException('Invalid email or password', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Неверный email или пароль', HttpStatus.UNAUTHORIZED);
     }
 
     delete user.password; // !!! надо переделать

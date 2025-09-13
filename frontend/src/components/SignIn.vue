@@ -32,7 +32,7 @@ const onSubmit = handleSubmit(async () => {
       <form @submit.prevent="onSubmit" class="login-form__form">
         <div class="login-form__input-group">
           <div class="login-form__input-group-item">
-            <label for="email" class="login-form__label">Почта</label>
+            <label for="email" class="login-form__label">Email</label>
             <input type="text" id="email" v-model="email" class="login-form__input" />
             <span class="registration-form__input-error">{{ errors.email }}</span>
           </div>

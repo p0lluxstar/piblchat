@@ -43,7 +43,7 @@ const onSubmit = handleSubmit(async () => {
             <span class="registration-form__input-error">{{ errors.username }}</span>
           </div>
           <div class="registration-form__input-group-item">
-            <label for="email" class="registration-form__label">Почта</label>
+            <label for="email" class="registration-form__label">Email</label>
             <input type="text" id="email" v-model="email" class="registration-form__input" />
             <span class="registration-form__input-error">{{ errors.email }}</span>
           </div>

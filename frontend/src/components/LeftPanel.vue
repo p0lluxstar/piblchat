@@ -4,6 +4,7 @@ import { socket } from '@/socket';
 import { socketEmitGetUserChats, socketEmitJoinChat } from '@/socket/socketMethods';
 import { socketEmitGetMessagesChat } from '@/socket/socketMethods';
 import { useActiveChatsStore } from '@/store/useActiveChatsStore';
+import { useActiveLeftPanelStore } from '@/store/useActiveLeftPanelStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSelectedChatStore } from '@/store/useSelectedChatStore';
 import type { IDataActiveChat, IUserData, IUserDataActiveChats } from '@/types';
@@ -21,6 +22,8 @@ const isSearchActive = ref(false);
 const dataActiveChats = ref<IDataActiveChat[]>([]);
 const activeChatsStore = useActiveChatsStore();
 const savedActiveChats = computed(() => activeChatsStore.activeChats);
+const activeLeftPanelStore = useActiveLeftPanelStore();
+
 let debounceTimeout: ReturnType<typeof setTimeout>;
 
 watch(searchUserNameQuery, (newQuery) => {
@@ -41,6 +44,7 @@ watch(searchUserNameQuery, (newQuery) => {
 
 const handleUserSelect = (user: IUserData & { chatId?: number }): void => {
   const foundChat = savedActiveChats.value.find((item) => item.id === user.id);
+  activeLeftPanelStore.falseActiveLeftPanel();
 
   if (foundChat?.chatId) {
     selectedChatStore.selectedChatId = foundChat.chatId;
@@ -52,10 +56,12 @@ const handleUserSelect = (user: IUserData & { chatId?: number }): void => {
         emit('messagesChat', messagesChat);
       });
     }
+  } else {
+    emit('messagesChat', []);
   }
 
   emit('userSelectedData', user);
-  emit('messagesChat', []);
+
   selectedUser.value = user;
   searchUserNameQuery.value = '';
   searchUsers.value = [];

@@ -13,9 +13,7 @@ const { isAuthenticated } = storeToRefs(authStore);
       <TheLogo />
       <div>
         <h1>Добро пожаловать в наш чат!</h1>
-        <p>
-          Общайтесь с друзьями, коллегами и единомышленниками в удобном и безопасном мессенджере.
-        </p>
+        <p>Общайтесь с друзьями, коллегами и единомышленниками в удобном мессенджере.</p>
         <div class="auth-buttons">
           <router-link class="btn btn-primary" v-if="!isAuthenticated" to="/signup"
             >Регистрация</router-link

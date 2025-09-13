@@ -47,3 +47,15 @@
 .registration-form__error {
   @include form-error;
 }
+
+.registration-form__warning {
+  background-color: red;
+  border-radius: 4px;
+  padding: 4px;
+  font-size: 12px;
+  color: white;
+
+  @media (max-width: 540px) {
+    font-size: 14px;
+  }
+}

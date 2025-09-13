@@ -1,4 +1,48 @@
+.left-panel {
+  background: #f0f0f0;
+  width: 30%;
+  min-width: 20%;
+  max-width: 40%;
+  transition: width 0.2s;
+}
+
+.resizer {
+  width: 6px;
+  background: #cccccc8f;
+  cursor: col-resize;
+  position: relative;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background: #ccccccbf;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 40px;
+    background-color: white;
+    border-radius: 2px;
+  }
+
+  @media (max-width: 540px) {
+    display: none;
+  }
+}
+
+.right-panel {
+  background: #ddd;
+  flex: 1;
+}
+
 .chat-container {
+  display: flex;
+  width: 100%;
+  overflow: hidden;
   height: calc(100vh - 60px);
 
   .splitpanes {
@@ -23,5 +67,55 @@
         background: #9e9e9e;
       }
     }
+  }
+}
+
+// @media (max-width: 800px) {
+//   .left-panel {
+//     width: 25%;
+//   }
+
+//   .right-panel {
+//     width: 75%;
+//   }
+// }
+
+// @media (min-width: 1400px) {
+//   .left-panel {
+//     width: 20%;
+//   }
+
+//   .right-panel {
+//     width: 80%;
+//   }
+// }
+
+// @media (min-width: 1800px) {
+//   .left-panel {
+//     width: 15%;
+//   }
+
+//   .right-panel {
+//     width: 85%;
+//   }
+// }
+
+@media (max-width: 540px) {
+  .left-panel {
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    max-width: 100%;
+    left: -540px;
+    transition: left 0.3s ease;
+    border-right: none;
+  }
+
+  .left-panel.active {
+    left: 0px;
+  }
+
+  .right-panel {
+    width: 100%;
   }
 }
