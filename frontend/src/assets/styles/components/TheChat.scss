@@ -70,36 +70,6 @@
   }
 }
 
-// @media (max-width: 800px) {
-//   .left-panel {
-//     width: 25%;
-//   }
-
-//   .right-panel {
-//     width: 75%;
-//   }
-// }
-
-// @media (min-width: 1400px) {
-//   .left-panel {
-//     width: 20%;
-//   }
-
-//   .right-panel {
-//     width: 80%;
-//   }
-// }
-
-// @media (min-width: 1800px) {
-//   .left-panel {
-//     width: 15%;
-//   }
-
-//   .right-panel {
-//     width: 85%;
-//   }
-// }
-
 @media (max-width: 540px) {
   .left-panel {
     position: absolute;
@@ -109,6 +79,7 @@
     left: -540px;
     transition: left 0.3s ease;
     border-right: none;
+    height: calc(100vh - 60px);
   }
 
   .left-panel.active {

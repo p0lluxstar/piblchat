@@ -13,3 +13,9 @@ body {
 html {
   min-height: 100%;
 }
+
+/*что не отображался значок показать пароль встроенный в браузер*/
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}

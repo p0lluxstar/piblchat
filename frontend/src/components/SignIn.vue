@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useField, useForm } from 'vee-validate';
+import { ref } from 'vue';
 import type { ILoginPayload } from '@/types';
 import { fetchAuth } from '@/utils/fetchAuth';
 import { loginSchema } from '@/yup/validationSchema';
 import TheLoader from './TheLoader.vue';
-const apiUrl = import.meta.env.VITE_API_URL;
+import ToggleShowPassword from './ToggleShowPassword.vue';
 
+const apiUrl = import.meta.env.VITE_API_URL;
 const { isLoading, isError, errorMessage, submit } = fetchAuth(`${apiUrl}/users/login`);
 
 const { handleSubmit, errors } = useForm({
@@ -14,6 +16,8 @@ const { handleSubmit, errors } = useForm({
 
 const { value: email } = useField<string>('email');
 const { value: password } = useField<string>('password');
+
+const showPassword = ref(false);
 
 const onSubmit = handleSubmit(async () => {
   const payload: ILoginPayload = {
@@ -38,7 +42,13 @@ const onSubmit = handleSubmit(async () => {
           </div>
           <div class="login-form__input-group-item">
             <label for="password" class="login-form__label">Пароль</label>
-            <input type="password" id="password" v-model="password" class="login-form__input" />
+            <input
+              :type="showPassword ? 'text' : 'password'"
+              id="password"
+              v-model="password"
+              class="login-form__input"
+            />
+            <ToggleShowPassword @toggle="(value) => (showPassword = value)" />
             <span class="registration-form__input-error">{{ errors.password }}</span>
           </div>
         </div>

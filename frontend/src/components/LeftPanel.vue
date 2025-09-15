@@ -10,6 +10,7 @@ import { useSelectedChatStore } from '@/store/useSelectedChatStore';
 import type { IDataActiveChat, IUserData, IUserDataActiveChats } from '@/types';
 import { fetchSearchUsers } from '@/utils/fetchSearchUsers';
 import IconChatStatus from './icons/IconChatStatus.vue';
+import ToggleShowLeftPanel from './ToggleShowLeftPanel.vue';
 import UserBadge from './UserBadge.vue';
 
 const emit = defineEmits(['userSelectedData', 'messagesChat']);
@@ -114,10 +115,11 @@ onUnmounted(() => {
 <template>
   <div class="left-panel-container">
     <div class="left-panel__search">
+      <div class="left-panel__close-icon"><ToggleShowLeftPanel :show="false" /></div>
       <input
         type="text"
         v-model="searchUserNameQuery"
-        placeholder="Поиск..."
+        placeholder="Поиск по имени"
         class="left-panel__search-input"
       />
     </div>

@@ -48,6 +48,8 @@ export function fetchAuth(url: string): IUseFetchAuthReturn {
       return true;
     } catch (err) {
       console.error('Auth error:', err);
+      isError.value = true;
+      // errorMessage.value = 'Ошибка соединения с сервером';
       return false;
     } finally {
       isLoading.value = false;

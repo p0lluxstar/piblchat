@@ -6,37 +6,12 @@
   background-image: url('../../img/jpg/background-chat.jpg');
   position: relative;
 
-  .right-panel__left-arrow-icon,
-  .right-panel__header-left-arrow-icon {
-    display: none;
-    border: none;
-    background: none;
-
-    &:hover {
-      opacity: 0.8;
-      cursor: pointer;
-    }
-
-    svg {
-      width: 35px;
-      height: 35px;
-    }
-
-    @media (max-width: 540px) {
-      display: block;
-    }
-  }
-
-  .right-panel__left-arrow-icon svg {
-    display: none;
-    width: 35px;
-    height: 35px;
-
+  .right-panel__burgermenu-icon {
     @media (max-width: 540px) {
       display: block;
       position: absolute;
-      left: 12px;
-      top: 12px;
+      left: 10px;
+      top: 10px;
     }
   }
 
@@ -94,6 +69,13 @@
       padding: 10px;
       height: 60px;
       box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+
+      .right-panel__header-burgermenu-icon {
+        display: none;
+        @media (max-width: 540px) {
+          display: block;
+        }
+      }
 
       .user-panel__name {
         color: #505050;

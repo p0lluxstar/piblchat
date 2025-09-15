@@ -4,6 +4,10 @@
   align-items: center;
   min-height: 100vh;
   padding: 40px;
+
+  @media (max-width: 360px) {
+    padding: 20px;
+  }
 }
 
 .home-page {

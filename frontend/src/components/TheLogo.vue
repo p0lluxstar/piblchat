@@ -11,6 +11,7 @@ const { isAuthenticated } = storeToRefs(authStore);
     <span class="logo-text">PiblCHAT</span>
   </div>
 </template>
+
 <style scoped lang="scss">
 @use '@/assets/styles/components/TheLogo.scss';
 </style>

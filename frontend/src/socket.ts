@@ -4,9 +4,14 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 export let socket: Socket | null = null;
 
-export const connectSocket = (): Socket => {
+export const connectSocket = (): Socket | null => {
   const authStore = useAuthStore();
-  const userId = authStore.user?.id || null;
+  const userId = authStore.user?.id;
+
+  if (!userId) {
+    console.warn('Нет userId, сокет не подключаем');
+    return null;
+  }
 
   if (!socket) {
     socket = io(`${apiUrl}`, {

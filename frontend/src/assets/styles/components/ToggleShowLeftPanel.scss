@@ -1,0 +1,19 @@
+.btn-icon {
+  display: none;
+  border: none;
+  background: none;
+
+  &:hover {
+    opacity: 0.8;
+    cursor: pointer;
+  }
+
+  svg {
+    width: 35px;
+    height: 35px;
+  }
+
+  @media (max-width: 540px) {
+    display: block;
+  }
+}

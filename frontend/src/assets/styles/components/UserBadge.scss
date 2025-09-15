@@ -4,12 +4,30 @@
 
   .user-panel__info {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     align-items: center;
 
-    .user-panel__name {
-      font-size: 1.3em;
-      font-weight: bold;
+    .user-panel__avatar-block {
+      position: relative;
+
+      .user-panel__delete-user {
+        position: absolute;
+        right: -4px;
+        top: -6px;
+        background: #ffffff;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+
+        &:hover{
+          opacity: 0.8;
+        }
+
+        svg {
+          width: 18px;
+          height: 12px;
+        }
+      }
     }
 
     .user-panel__avatar {
@@ -23,6 +41,22 @@
       font-weight: bold;
       font-size: 18px;
       line-height: 18px;
+    }
+
+    .user-panel__details {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+
+      .user-panel__name {
+        font-size: 1.3em;
+        font-weight: bold;
+      }
+
+      .user-panel__email {
+        font-size: 0.8em;
+        color: #ffffff;
+      }
     }
   }
 }

@@ -11,7 +11,6 @@ import {
   socketOnceStartChatResponse,
 } from '@/socket/socketMethods';
 import { useActiveChatsStore } from '@/store/useActiveChatsStore';
-import { useActiveLeftPanelStore } from '@/store/useActiveLeftPanelStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useSelectedChatStore } from '@/store/useSelectedChatStore';
 import type { IMessagesChat, IUserData } from '@/types';
@@ -19,8 +18,8 @@ import { useEmojiInsertione } from '@/utils/addEmojiToMessage';
 import { formatDay, formatTime, showDate } from '@/utils/formatDate';
 import ConfirmModal from './ConfirmModal.vue';
 import IconDeleteChat from './icons/IconDeleteChat.vue';
-import IconLeftArrow from './icons/IconLeftArrow.vue';
 import IconSendMessage from './icons/IconSendMessage.vue';
+import ToggleShowLeftPanel from './ToggleShowLeftPanel.vue';
 
 const props = defineProps<{
   userSelectedData: IUserData | null;
@@ -38,7 +37,6 @@ const messagesContainer = ref<HTMLDivElement | null>(null);
 const { addEmojiToMessage } = useEmojiInsertione(messageText);
 const showDeleteConfirm = ref(false);
 const activeChatsStore = useActiveChatsStore();
-const activeLeftPanelStore = useActiveLeftPanelStore();
 
 watch(
   [
@@ -67,9 +65,11 @@ const sendMessage = async (): Promise<void> => {
       props.userSelectedData?.id,
       messageText.value
     );
+    setTimeout(() => {
+      emit('loadUserChats');
+    }, 100);
 
     if (startChatResponse) {
-      emit('loadUserChats');
       selectedChatStore.selectedChatId = startChatResponse.chatId;
     }
   }
@@ -112,10 +112,15 @@ const handleDeleteChat = (): void => {
 
 const confirmDelete = (): void => {
   if (!selectedChatId.value) return;
-  socketEmitDeleteChat(selectedChatId.value);
+  selectedUser.value = null;
   showDeleteConfirm.value = false;
+  socketEmitDeleteChat(selectedChatId.value);
   activeChatsStore.removeChatById(selectedChatId.value);
   selectedChatStore.clearSelectedChat();
+
+  // setTimeout(() => {
+  //   emit('loadUserChats');
+  // }, 100);
 };
 
 watch(messagesChat, scrollToBottom, { deep: true });
@@ -134,8 +139,8 @@ onMounted(() => {
 
   socket.on('delete-chat', (data) => {
     if (data) {
-      emit('loadUserChats');
       selectedUser.value = null;
+      emit('loadUserChats');
       return;
     }
   });
@@ -157,13 +162,7 @@ onUnmounted(() => {
 
 <template>
   <div class="right-panel-container">
-    <button
-      v-if="!selectedUser"
-      class="right-panel__left-arrow-icon"
-      @click="activeLeftPanelStore.trueActiveLeftPanel()"
-    >
-      <IconLeftArrow />
-    </button>
+    <div class="right-panel__burgermenu-icon"><ToggleShowLeftPanel :show="true" /></div>
     <div v-if="!selectedUser" class="right-panel__empty-chat">
       <p class="empty-state__description">
         Начните новый диалог или выберите <br />
@@ -172,12 +171,7 @@ onUnmounted(() => {
     </div>
     <div v-else class="right-panel__chat-container">
       <div class="right-panel__chart-header">
-        <button
-          class="right-panel__header-left-arrow-icon"
-          @click="activeLeftPanelStore.trueActiveLeftPanel()"
-        >
-          <IconLeftArrow />
-        </button>
+        <div class="right-panel__header-burgermenu-icon"><ToggleShowLeftPanel :show="true" /></div>
         <UserBadge :userData="selectedUser" />
         <div v-if="messagesChat.length" class="right-panel__delete-chat">
           <button @click="handleDeleteChat()" class="right-panel__delete-button">

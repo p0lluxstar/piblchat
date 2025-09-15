@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Post,
   Put,
@@ -71,5 +72,11 @@ export class UserController {
   ): Promise<IUserResponse> {
     const user = await this.userService.updateUser(currentUserId, updateUserDto);
     return this.userService.buildUserResponse(user);
+  }
+
+  @Delete('delete')
+  @UseGuards(AuthGuard)
+  async deleteUser(@Query('userName') userName: string): Promise<User> {
+    return this.userService.deleteUser(userName);
   }
 }

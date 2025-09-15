@@ -23,19 +23,21 @@ export class UserService {
 
   async findUsersByUserName(
     userName: string
-  ): Promise<{ id: number; userName: string; colorAvatar: string }[]> {
+  ): Promise<{ id: number; userName: string; email: string; colorAvatar: string }[]> {
     return this.prisma.user.findMany({
       where: {
         userName: {
           startsWith: userName,
+          mode: 'insensitive', // игнорирует регистр
         },
       },
       select: {
         id: true,
         userName: true,
+        email: true,
         colorAvatar: true,
       },
-      take: 10, // ограничиваем количество результатов до 10
+      take: 15, // ограничиваем количество результатов до 10
     });
   }
 
@@ -141,5 +143,16 @@ export class UserService {
     }
 
     return user;
+  }
+
+  async deleteUser(userName: string): Promise<User | null> {
+    try {
+      const deletedUser = await this.prisma.user.delete({
+        where: { userName },
+      });
+      return deletedUser;
+    } catch (error) {
+      return null;
+    }
   }
 }

@@ -12,7 +12,7 @@ import { ChatService } from './chat.service';
 
 @WebSocketGateway({
   cors: {
-    origin:  process.env.ALLOWED_ORIGINS?.split(',') || [], // Точный адрес вашего фронтенда
+    origin: process.env.ALLOWED_ORIGINS?.split(',') || [], // Точный адрес вашего фронтенда
     credentials: true, // Разрешить передачу кук/заголовков авторизации
   },
 })
@@ -20,7 +20,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly chatService: ChatService,
     private readonly messsgeService: MessageService
-    // private readonly messageService: MessageService
   ) {}
 
   private userSockets: Map<number, string> = new Map();
@@ -29,12 +28,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // Подключение клиента
   async handleConnection(client: Socket) {
-    const userId = Number(client.handshake.query.userId);
+    const rawUserId = client.handshake.query.userId;
+    // console.log('Raw userId:', rawUserId);
 
-    if (userId) {
-      this.userSockets.set(userId, client.id);
-      // console.log(`User id: ${userId} connected with socket ${client.id}`);
+    const userId = Number(rawUserId);
+    if (!userId || isNaN(userId)) {
+      // console.warn(`Клиент ${client.id} не передал корректный userId`);
+      client.disconnect(true);
+      return;
     }
+
+    this.userSockets.set(userId, client.id);
+    // console.log(`User id: ${userId} connected with socket ${client.id}`);
   }
 
   // Отключение клиента
@@ -53,18 +58,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('create-chat')
   async handleCreateChat(client: Socket, payload: { userOneId: number; userTwoId: number }) {
     try {
-      // Проверяем, есть ли уже чат
+      // 1. Проверяем, есть ли уже чат между двумя пользователями
       let chat = await this.chatService.findChatBetweenUsers(payload.userOneId, payload.userTwoId);
 
-      // Если нет — создаём
+      // 2. Если чата нет — создаём новый
       if (!chat) {
         chat = await this.chatService.createChat(payload.userOneId, payload.userTwoId);
 
+        // Массив id участников
         const userIds = [payload.userOneId, payload.userTwoId];
 
+        // 3. Для каждого пользователя ищем его socketId
         userIds.forEach((id) => {
           const socketId = this.userSockets.get(id);
 
+          // 4. Если пользователь подключён — отправляем ему событие "create-chat"
           if (socketId) {
             this.server.to(socketId).emit('create-chat', {
               chatId: chat.id,
@@ -73,12 +81,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           }
         });
 
+        // 5. Отправляем ответ инициатору запроса (клиенту, который вызвал "create-chat")
         client.emit('create-chat-response', {
           success: true,
           chatId: chat.id,
         });
       }
     } catch (error) {
+      // 6. Логируем ошибку и отправляем клиенту сообщение об ошибке
       console.error('Ошибка при создании чата:', error);
       client.emit('create-chat-response', {
         success: false,

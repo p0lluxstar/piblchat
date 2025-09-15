@@ -3,7 +3,7 @@ import type { Ref } from 'vue';
 export interface IUserData {
   id: number;
   userName: string;
-  email?: string;
+  email: string;
   colorAvatar: string;
   chatStatus?: boolean;
 }
@@ -14,6 +14,7 @@ export interface IDataActiveChat {
   users: {
     id: number;
     userName: string;
+    email: string;
     colorAvatar: string;
   }[];
 }
@@ -22,6 +23,7 @@ export interface IUserDataActiveChats {
   id: number;
   userName: string;
   colorAvatar: string;
+  email: string;
   chatId: number;
 }
 
@@ -52,4 +54,8 @@ export interface IRegistrationPayload extends ILoginPayload {
   colorAvatar: string;
 }
 
-export type TAuthPayload = ILoginPayload | IRegistrationPayload;
+export interface IDeleteUserPayload {
+  userName: string;
+}
+
+export type TAuthPayload = ILoginPayload | IRegistrationPayload | IDeleteUserPayload;
