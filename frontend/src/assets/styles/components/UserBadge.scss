@@ -19,7 +19,7 @@
         border-radius: 50%;
         cursor: pointer;
 
-        &:hover{
+        &:hover {
           opacity: 0.8;
         }
 
@@ -41,6 +41,7 @@
       font-weight: bold;
       font-size: 18px;
       line-height: 18px;
+      border: 1px solid #c4c4cc;
     }
 
     .user-panel__details {

@@ -32,7 +32,7 @@ const confirmLogout = (): void => {
   <header class="header">
     <TheLogo />
     <div class="header__user-panel">
-      <UserBadge v-if="user" :userData="user" />
+      <UserBadge v-if="user" :userData="user" :isShowSettingBtn="true" />
       <button class="header__logout-button" v-if="isAuthenticated" @click="showConfirmLogout">
         <IconLogout />
       </button>

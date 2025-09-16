@@ -20,19 +20,30 @@
   .logo-image {
     width: 45px;
     height: 45px;
+
+    @media (max-width: 420px) {
+      width: 35px;
+      height: 35px;
+    }
   }
 
   .logo-text {
     font-size: 1.6rem;
     font-weight: bold;
     color: white;
+
+    @media (max-width: 540px) {
+      font-size: 1.4rem;
+    }
+
+    @media (max-width: 420px) {
+      font-size: 1rem;
+    }
   }
 }
 
-@media (max-width: 540px) {
-  .logo-container-auth {
-    .logo-text {
-      font-size: 1.4rem;
-    }
+.logo-container-auth {
+  @media (max-width: 420px) {
+    flex-direction: column;
   }
 }

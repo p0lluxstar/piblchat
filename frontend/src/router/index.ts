@@ -4,6 +4,7 @@ import HomeLayout from '@/layouts/HomeLayout.vue';
 import { useAuthStore } from '@/store/useAuthStore';
 import ChatView from '@/views/ChatView.vue';
 import HomeView from '@/views/HomeView.vue';
+import ProfileView from '@/views/ProfileView.vue';
 import SignInView from '@/views/SignInView.vue';
 import SignUpView from '@/views/SignUpView.vue';
 
@@ -12,6 +13,7 @@ enum RouteNames {
   SIGN_IN = 'signin',
   SIGN_UP = 'signup',
   CHAT = 'chat',
+  PROFILE = 'profile',
 }
 
 const router = createRouter({
@@ -49,6 +51,17 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: '/profile',
+      component: ChatLayout,
+      children: [
+        {
+          path: '',
+          name: RouteNames.PROFILE,
+          component: ProfileView,
+        },
+      ],
+    },
   ],
 });
 
@@ -62,6 +75,10 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (!authStore.isAuthenticated && to.name === RouteNames.CHAT) {
+    return next({ name: RouteNames.HOME });
+  }
+
+  if (!authStore.isAuthenticated && to.name === RouteNames.PROFILE) {
     return next({ name: RouteNames.HOME });
   }
 

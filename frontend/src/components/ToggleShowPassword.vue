@@ -14,8 +14,8 @@ const togglePassword = (): void => {
 
 <template>
   <button type="button" class="form__toggle-password" @click="togglePassword">
-    <IconShowPassword v-if="showPassword" />
-    <IconHidePassword v-else />
+    <IconHidePassword v-if="showPassword" />
+    <IconShowPassword v-else />
   </button>
 </template>
 

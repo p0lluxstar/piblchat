@@ -9,7 +9,7 @@ export const connectSocket = (): Socket | null => {
   const userId = authStore.user?.id;
 
   if (!userId) {
-    console.warn('Нет userId, сокет не подключаем');
+    // console.warn('Нет userId, сокет не подключаем');
     return null;
   }
 

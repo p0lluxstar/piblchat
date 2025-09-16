@@ -48,7 +48,10 @@ const onSubmit = handleSubmit(async () => {
               v-model="password"
               class="login-form__input"
             />
-            <ToggleShowPassword @toggle="(value) => (showPassword = value)" />
+            <ToggleShowPassword
+              v-if="password?.length > 0"
+              @toggle="(value) => (showPassword = value)"
+            />
             <span class="registration-form__input-error">{{ errors.password }}</span>
           </div>
         </div>

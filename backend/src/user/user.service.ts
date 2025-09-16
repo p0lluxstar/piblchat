@@ -37,7 +37,7 @@ export class UserService {
         email: true,
         colorAvatar: true,
       },
-      take: 15, // ограничиваем количество результатов до 10
+      take: 30, // ограничиваем количество результатов до 30
     });
   }
 
@@ -146,13 +146,43 @@ export class UserService {
   }
 
   async deleteUser(userName: string): Promise<User | null> {
-    try {
-      const deletedUser = await this.prisma.user.delete({
+    return this.prisma.$transaction(async (tx) => {
+      // 1. Находим пользователя
+      const user = await tx.user.findUnique({
+        where: { userName },
+        select: { id: true },
+      });
+
+      if (!user) return null;
+
+      // 2. Находим все чаты, где он участвовал
+      const chats = await tx.chat.findMany({
+        where: {
+          users: { some: { id: user.id } },
+        },
+        select: { id: true },
+      });
+
+      const chatIds = chats.map((c) => c.id);
+
+      if (chatIds.length > 0) {
+        // 3. Удаляем сообщения в этих чатах
+        await tx.message.deleteMany({
+          where: { chatId: { in: chatIds } },
+        });
+
+        // 4. Удаляем сами чаты
+        await tx.chat.deleteMany({
+          where: { id: { in: chatIds } },
+        });
+      }
+
+      // 5. Удаляем пользователя
+      const deletedUser = await tx.user.delete({
         where: { userName },
       });
+
       return deletedUser;
-    } catch (error) {
-      return null;
-    }
+    });
   }
 }

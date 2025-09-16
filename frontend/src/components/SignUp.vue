@@ -61,7 +61,10 @@ const onSubmit = handleSubmit(async () => {
               v-model="password"
               class="registration-form__input"
             />
-            <ToggleShowPassword @toggle="(value) => (showPassword = value)" />
+            <ToggleShowPassword
+              v-if="password?.length > 0"
+              @toggle="(value) => (showPassword = value)"
+            />
             <span class="registration-form__input-error">{{ errors.password }}</span>
           </div>
           <div class="registration-form__input-group-item">
@@ -72,7 +75,10 @@ const onSubmit = handleSubmit(async () => {
               v-model="confirmPassword"
               class="registration-form__input"
             />
-            <ToggleShowPassword @toggle="(value) => (showconfirmPassword = value)" />
+            <ToggleShowPassword
+              v-if="confirmPassword"
+              @toggle="(value) => (showconfirmPassword = value)"
+            />
             <span class="registration-form__input-error">{{ errors.confirmPassword }}</span>
           </div>
         </div>

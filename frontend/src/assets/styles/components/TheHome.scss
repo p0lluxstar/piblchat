@@ -22,7 +22,8 @@
 }
 
 .home-page p {
-  font-size: 1.7rem;
+  text-transform: uppercase;
+  font-size: 1.5rem;
   color: #444;
   margin-bottom: 2rem;
 }
@@ -38,6 +39,7 @@
   border: none;
   border-radius: 8px;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s;
   text-decoration: none;

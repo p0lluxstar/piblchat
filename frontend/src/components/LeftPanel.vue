@@ -128,7 +128,7 @@ onUnmounted(() => {
         <li v-for="user in searchUsers" :key="user.id" class="left-panel__search-item">
           <button @click="handleUserSelect(user)" class="left-panel__user-button">
             <UserBadge :userData="user" />
-            <span v-if="user.chatStatus" class="left-panel__user-chat-staus"
+            <span v-if="user.chatStatus" class="left-panel__user-chat-status"
               ><IconChatStatus
             /></span>
           </button>

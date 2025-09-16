@@ -1,7 +1,12 @@
 import * as yup from 'yup';
 
 export const registrationSchema = yup.object({
-  username: yup.string().required('Поле обязательно'),
+  username: yup
+    .string()
+    .min(3, 'Минимум 3 символа')
+    .max(20, 'Максимум 20 символов')
+    .matches(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/, 'Недопустимые символы')
+    .required('Поле обязательно'),
   email: yup
     .string()
     .email('Неверный email')

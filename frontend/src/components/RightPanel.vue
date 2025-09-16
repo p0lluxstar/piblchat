@@ -180,7 +180,7 @@ onUnmounted(() => {
           <ConfirmModal
             :show="showDeleteConfirm"
             title="Удалить чат?"
-            message="Вы уверены, что хотите удалить этот чат? Это действие нельзя отменить."
+            message="Чат будет полностью удален для всех участников. Это действие необратимо."
             confirm-text="Удалить"
             @confirm="confirmDelete"
             @cancel="showDeleteConfirm = false"

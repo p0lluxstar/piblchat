@@ -1,0 +1,90 @@
+@use '@/assets/styles/mixins/forms' as *;
+
+.profile {
+  position: relative;
+  padding: 40px;
+  color: #505050;
+
+  @media (max-width: 540px) {
+    padding: 20px;
+    padding-top: 30px;
+  }
+
+  .profile__btn-back-chat {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    border: none;
+    background: none;
+    color: #505050;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    svg {
+      width: 35px;
+      height: 35px;
+    }
+  }
+
+  .profile__user-data-title {
+    margin-bottom: 20px;
+  }
+
+  .profile__data-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    list-style: none;
+
+    li {
+      font-weight: bold;
+    }
+  }
+
+  .profile__avatar-color {
+    display: flex;
+    align-items: center;
+
+    span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      margin-left: 5px;
+      border-radius: 50%;
+      color: #ffffff;
+      font-size: 11px;
+    }
+  }
+
+  .profile__delete-block {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 5px;
+
+    .profile__btn-delete {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      text-decoration: none;
+      font-weight: 600;
+      color: #505050;
+
+      &:hover {
+        background-color: #e0e0e0;
+      }
+    }
+  }
+
+  .profile__title {
+    color: #505050;
+  }
+}
