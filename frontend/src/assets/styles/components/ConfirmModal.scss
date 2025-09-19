@@ -42,9 +42,11 @@
   cursor: pointer;
   border: none;
   font-weight: 500;
+  transition: all 0.3s ease;
 
   &:hover {
     opacity: 0.8;
+    transform: translateY(-2px);
   }
 }
 

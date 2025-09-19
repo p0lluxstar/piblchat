@@ -48,6 +48,10 @@
   @include form-error;
 }
 
+.registration-container {
+  @include fadeInUp-animation;
+}
+
 .registration-form__warning {
   background-color: red;
   border-radius: 4px;

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import NotFoundPage from '@/components/NotFoundPage.vue';
 import ChatLayout from '@/layouts/ChatLayout.vue';
 import HomeLayout from '@/layouts/HomeLayout.vue';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -37,6 +38,11 @@ const router = createRouter({
           path: 'signin',
           name: RouteNames.SIGN_IN,
           component: SignInView,
+        },
+        {
+          path: '/:pathMatch(.*)*',
+          name: 'NotFound',
+          component: NotFoundPage,
         },
       ],
     },

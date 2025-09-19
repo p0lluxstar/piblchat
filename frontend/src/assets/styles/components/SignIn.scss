@@ -47,3 +47,7 @@
 .login-form__error {
   @include form-error;
 }
+
+.login-container {
+  @include fadeInUp-animation;
+}
